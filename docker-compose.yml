@@ -39,8 +39,8 @@ services:
     ports:
       - "443:443"
     volumes:
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
-      - ./certs:/etc/ssl/local:ro
+      - ./nginx:/etc/nginx/conf.d:ro
+      - ./certs:/etc/ssl/local:rw
     command: sh -c "nginx -g 'daemon off;'"
 
 
