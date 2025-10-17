@@ -22,7 +22,7 @@ jobs:
 
       - name: Mirror to GitLab (Basic Auth)
         env:
-          GITLAB_REPO: https://lab.i4624.info/good-restaurant/gs-database.git
+          GITLAB_REPO: ${{ secrets.GITLAB_REPOSITORY }}
           GITLAB_USERNAME: ${{ secrets.GITLAB_USERNAME }}
           GITLAB_TOKEN: ${{ secrets.MIRRORING_PAT }}   # write_repository 포함
           GITHUB_REF_TYPE: ${{ github.ref_type }}      # branch | tag
