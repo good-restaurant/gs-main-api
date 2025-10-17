@@ -1,0 +1,78 @@
+stages: [build, deploy]
+
+# 공통: Docker-in-Docker
+image: docker:27
+services:
+  - name: docker:27-dind
+    alias: docker
+variables:
+  DOCKER_HOST: tcp://docker:2375
+  DOCKER_TLS_CERTDIR: ""
+  DOCKER_BUILDKIT: "1"
+  # 기본 이미지 태그 (커밋 단위)
+  IMAGE_TAG: "$CI_COMMIT_SHORT_SHA"
+
+# 1) 이미지 빌드 + 푸시 (GitLab Registry)
+build-image:
+  stage: build
+  script:
+    - echo "Login to GitLab Registry: $CI_REGISTRY"
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
+
+    # 캐시 친화 빌드
+    - docker build \
+      --build-arg BUILD_PROFILE=prod \
+      --build-arg APP_VERSION="${CI_COMMIT_TAG:-$CI_COMMIT_SHORT_SHA}" \
+      --build-arg VCS_REF="$CI_COMMIT_SHORT_SHA" \
+      --build-arg BUILD_TIME="$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+      -t "$CI_REGISTRY_IMAGE:$IMAGE_TAG" \
+      -t "$CI_REGISTRY_IMAGE:ci-$CI_COMMIT_REF_SLUG" \
+      .
+
+    - docker push "$CI_REGISTRY_IMAGE:$IMAGE_TAG"
+    - docker push "$CI_REGISTRY_IMAGE:ci-$CI_COMMIT_REF_SLUG"
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH'  # 모든 브랜치에서 빌드
+
+# 2) 배포: compose로 런타임 변수 주입 + 이미지 태그 override
+deploy:
+  stage: deploy
+  needs: ["build-image"]
+  # 배포 러너가 대상 호스트의 도커 데몬에 접근 가능해야 함
+  # (예: /var/run/docker.sock 바인딩 러너 or tcp://remote-docker)
+  variables:
+    DOCKER_HOST: "tcp://docker:2375"
+    DOCKER_TLS_CERTDIR: ""
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
+
+    # 런타임 환경변수 파일 작성 (DB_URL/DB_USERNAME/DB_PASSWORD는 GitLab Variables에서 주입)
+    - |
+      printf "DB_URL=%s\nDB_USERNAME=%s\nDB_PASSWORD=%s\n" \
+        "$DB_URL" "$DB_USERNAME" "$DB_PASSWORD" > .env.runtime
+
+    # compose override 파일로 'build:' 제거하고 'image:'를 지정
+    - |
+      cat > compose.ci.yaml <<'YAML'
+      services:
+        app:
+          image: IMAGE_PLACEHOLDER
+          # 배포 환경에서 필요한 런타임 변수(선호에 따라 env_file로도 가능)
+          environment:
+            SERVER_PORT: "8080"
+            DB_URL: ${DB_URL}
+            DB_USERNAME: ${DB_USERNAME}
+            DB_PASSWORD: ${DB_PASSWORD}
+      YAML
+    - sed -i "s|IMAGE_PLACEHOLDER|$CI_REGISTRY_IMAGE:$IMAGE_TAG|g" compose.ci.yaml
+
+  script:
+    # 최신 이미지 받기 (배포 호스트 캐시 동기화)
+    - docker pull "$CI_REGISTRY_IMAGE:$IMAGE_TAG"
+
+    # 컨테이너 교체 배포
+    - docker compose -f compose.yaml -f compose.ci.yaml --env-file .env.runtime up -d
+    - docker compose ps
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'

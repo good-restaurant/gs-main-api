@@ -64,3 +64,5 @@ out/
 ### env
 
 .env
+/certs/dev.crt
+/certs/dev.key
