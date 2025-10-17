@@ -4,7 +4,10 @@ services:
       context: .
       dockerfile: Dockerfile
     environment:
-      - SERVER_PORT=8080
+      SERVER_PORT: 8080
+      DB_URL: ${DB_URL}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
     expose:
       - "8080"
     # 개발 중 내부 확인용: 원하면 열어두기
