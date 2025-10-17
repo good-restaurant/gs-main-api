@@ -2,32 +2,45 @@ services:
   app:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: ./Dockerfile
     environment:
       SERVER_PORT: 8080
       DB_URL: ${DB_URL}
       DB_USERNAME: ${DB_USERNAME}
       DB_PASSWORD: ${DB_PASSWORD}
+      MANAGEMENT_SERVER_PORT: 8080
+      MANAGEMENT_ENDPOINTS_WEB_BASE_PATH: /actuator
+      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: health,info
+      # 필요 시 상세 표시
+      MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS: never
     expose:
       - "8080"
+      - "8080:8080"
     # 개발 중 내부 확인용: 원하면 열어두기
     # ports:
-    #   - "8080:8080"
+
+
+  certgen:
+    image: alpine:3.20
+    volumes:
+      - ./certs:/out:rw
+    command: >
+      sh -c "
+      apk add --no-cache openssl >/dev/null 2>&1;
+      [ -f /out/dev.key ] || openssl req -x509 -newkey rsa:2048 -nodes -days 825 -subj '/CN=dev-naver.i4624.info' -addext 'subjectAltName=DNS:dev-naver.i4624.info,IP:127.0.0.1' -keyout /out/dev.key -out /out/dev.crt"
 
   proxy:
     image: nginx:alpine
     depends_on:
-      - app
+      certgen:
+        condition: service_completed_successfully
+      app:
+        condition: service_started
     ports:
       - "443:443"
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
-      - ./certs:/etc/ssl/local:rw
-    # certs가 없으면 부팅시 1회성 self-signed 자동 생성 → 실행만 해도 https OK
-    command: >
-      sh -c "
-      [ -f /etc/ssl/local/dev.key ] || openssl req -x509 -newkey rsa:2048 -nodes -days 365
-        -subj '/CN=dev-naver.i4624.info'
-        -keyout /etc/ssl/local/dev.key
-        -out /etc/ssl/local/dev.crt;
-      nginx -g 'daemon off;'"
+      - ./certs:/etc/ssl/local:ro
+    command: sh -c "nginx -g 'daemon off;'"
+
+
