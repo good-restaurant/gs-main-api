@@ -39,8 +39,9 @@ build-image:
 deploy:
   stage: deploy
   needs: ["build-image"]
+  services: []  # DinD 끔
   variables:
-    DOCKER_HOST: "tcp://docker:2375"
+    DOCKER_HOST: "unix:///var/run/host_docker.sock"  # 별도로 정의한 host 소켓
     DOCKER_TLS_CERTDIR: ""
   before_script:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
