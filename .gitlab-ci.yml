@@ -39,40 +39,38 @@ build-image:
 deploy:
   stage: deploy
   needs: ["build-image"]
-  # 배포 러너가 대상 호스트의 도커 데몬에 접근 가능해야 함
-  # (예: /var/run/docker.sock 바인딩 러너 or tcp://remote-docker)
   variables:
     DOCKER_HOST: "tcp://docker:2375"
     DOCKER_TLS_CERTDIR: ""
   before_script:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
 
-    # 런타임 환경변수 파일 작성 (DB_URL/DB_USERNAME/DB_PASSWORD는 GitLab Variables에서 주입)
+    # 런타임 env 파일
     - |
       printf "DB_URL=%s\nDB_USERNAME=%s\nDB_PASSWORD=%s\n" \
         "$DB_URL" "$DB_USERNAME" "$DB_PASSWORD" > .env.runtime
 
-    # compose override 파일로 'build:' 제거하고 'image:'를 지정
+    # 이미지 override + build 제거
     - |
       cat > compose.ci.yaml <<'YAML'
       services:
         app:
+          build: null
           image: IMAGE_PLACEHOLDER
-          # 배포 환경에서 필요한 런타임 변수(선호에 따라 env_file로도 가능)
+          env_file:
+            - .env.runtime
           environment:
             SERVER_PORT: "8080"
-            DB_URL: ${DB_URL}
-            DB_USERNAME: ${DB_USERNAME}
-            DB_PASSWORD: ${DB_PASSWORD}
       YAML
     - sed -i "s|IMAGE_PLACEHOLDER|$CI_REGISTRY_IMAGE:$IMAGE_TAG|g" compose.ci.yaml
 
-  script:
-    # 최신 이미지 받기 (배포 호스트 캐시 동기화)
-    - docker pull "$CI_REGISTRY_IMAGE:$IMAGE_TAG"
+    - docker compose version
 
-    # 컨테이너 교체 배포
-    - docker compose -f compose.yaml -f compose.ci.yaml --env-file .env.runtime up -d
+  script:
+    - docker pull "$CI_REGISTRY_IMAGE:$IMAGE_TAG"
+    - docker compose -f docker-compose.yml -f compose.ci.yaml up -d
     - docker compose ps
+
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
+
