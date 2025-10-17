@@ -16,7 +16,7 @@ variables:
 build-image:
   stage: build
   script:
-    - echo "Login to GitLab Registry: $CI_REGISTRY"
+    # - echo "Login to GitLab Registry: $CI_REGISTRY"
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
 
     # 캐시 친화 빌드
