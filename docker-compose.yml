@@ -37,7 +37,7 @@ services:
       app:
         condition: service_started
     ports:
-      - "443:443"
+      - "8443:8443"
     volumes:
       - ./nginx:/etc/nginx/conf.d:ro
       - ./certs:/etc/ssl/local:rw
