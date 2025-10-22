@@ -38,8 +38,8 @@ services:
       app:
         condition: service_started
     ports:
-      - "443:443"    # ← 추가
-      - "8443:8443"
+      - "443:443"    # ← 추가 local 개발용 dev-naver.i4624.info 용
+      - "993:993"
     volumes:
       - ./nginx:/etc/nginx/conf.d:ro
       - ./certs:/etc/ssl/local:ro   # ← 인증서는 읽기 전용이면 충분
