@@ -35,16 +35,19 @@ public class SpringSecurityConfig {
 	                        CorsConfiguration configuration = new CorsConfiguration();
 	                        configuration.setAllowedOrigins(Arrays.asList(
 	                                "http://localhost",
-		                            "https://*.i4624.info",
+		                            "https://goodservice.i4624.info",
 			                        "https://dev-naver.i4624.info:3000",
 			                        "https://dev-naver.i4624.info:5173",
 			                        "https://localhost:18993",
 			                        "https://localhost:3000",
-			                        "https://localhost:5173"
+			                        "https://localhost:5173",
+			                        "http://gs-main-api.i4624.info"
 	                        )); // Update with your client's origins
+		                    configuration.addAllowedOriginPattern("https://*.i4624.info");
 	                        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 	                        configuration.setAllowedHeaders(Arrays.asList("*"));
 	                        configuration.setAllowCredentials(true); // Allow credentials if needed
+		                    
 	                        return configuration;
 	                    })
 	            )
