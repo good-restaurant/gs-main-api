@@ -67,6 +67,6 @@ deploy:
     - docker compose -f docker-compose.yml -f compose.ci.yaml up -d
     - docker compose ps
 
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "main"'
+#  rules:
+#    - if: '$CI_COMMIT_BRANCH == "main"'
 
