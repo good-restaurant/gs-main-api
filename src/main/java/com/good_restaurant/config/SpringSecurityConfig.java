@@ -35,7 +35,12 @@ public class SpringSecurityConfig {
 	                        CorsConfiguration configuration = new CorsConfiguration();
 	                        configuration.setAllowedOrigins(Arrays.asList(
 	                                "http://localhost",
-		                            "https://*.i4624.info"
+		                            "https://*.i4624.info",
+			                        "https://dev-naver.i4624.info:3000",
+			                        "https://dev-naver.i4624.info:5173",
+			                        "https://localhost:18993",
+			                        "https://localhost:3000",
+			                        "https://localhost:5173"
 	                        )); // Update with your client's origins
 	                        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 	                        configuration.setAllowedHeaders(Arrays.asList("*"));
