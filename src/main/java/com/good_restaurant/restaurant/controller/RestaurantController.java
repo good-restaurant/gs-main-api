@@ -3,6 +3,7 @@ package com.good_restaurant.restaurant.controller;
 import com.good_restaurant.restaurant.dto.DataListResDto;
 import com.good_restaurant.restaurant.dto.RestaurantCoordinateResDto;
 import com.good_restaurant.restaurant.dto.RestaurantCreateReqDto;
+import com.good_restaurant.restaurant.dto.RestaurantDetailResDto;
 import com.good_restaurant.restaurant.dto.RestaurantUpdateReqDto;
 import com.good_restaurant.restaurant.service.RestaurantService;
 import java.util.List;
@@ -32,6 +33,37 @@ public class RestaurantController {
 	public DataListResDto<RestaurantCoordinateResDto> getEntireRestaurantCoordinates(
 			@RequestParam(defaultValue = "100") int limit) {
 		List<RestaurantCoordinateResDto> data = restaurantService.getEntireRestaurantCoordinates(limit);
+		return new DataListResDto<>(data);
+	}
+
+	/**
+	 * 도로명 주소를 기반으로 주변 음식점 목록을 조회합니다.
+	 * @param address 도로명 주소
+	 * @param radius 검색 반경(위/경도 단위, 기본값: 0.1)
+	 * @param limit 조회할 음식점 개수(기본값: 20)
+	 * @return 주변 음식점 리스트
+	 */
+	@GetMapping("/nearby")
+	public DataListResDto<RestaurantDetailResDto> getNearbyRestaurants(
+			@RequestParam String address,
+			@RequestParam(defaultValue = "0.1") double radius,
+			@RequestParam(defaultValue = "20") int limit) {
+		List<RestaurantDetailResDto> data =
+				restaurantService.getNearbyRestaurants(address, radius, limit);
+		return new DataListResDto<>(data);
+	}
+
+	/**
+	 * 행정동 기반으로 주변 음식점 목록을 조회합니다.
+	 * @param emd 행정동
+	 * @return 주변 음식점 리스트
+	 */
+	@GetMapping("/emd")
+	public DataListResDto<RestaurantDetailResDto> findRestaurantsByEmd(
+			@RequestParam String emd,
+			@RequestParam(defaultValue = "20") int limit) {
+		List<RestaurantDetailResDto> data =
+				restaurantService.findRestaurantsByEmd(emd, limit);
 		return new DataListResDto<>(data);
 	}
 

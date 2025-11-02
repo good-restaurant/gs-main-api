@@ -1,8 +1,10 @@
 package com.good_restaurant.config;
 
+import io.swagger.v3.oas.models.servers.Server;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
+import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
@@ -15,7 +17,8 @@ public class SwaggerConfig {
 	public OpenAPI openAPI() {
 		return new OpenAPI()
 				.components(new Components())
-				.info(apiInfo());
+				.info(apiInfo())
+				.servers(List.of(new Server().url("/")));
 	}
 
 	private Info apiInfo() {

@@ -1,13 +1,17 @@
 # gs-nonvector-api
+
 Project for non-vector related api using with RESTful communication.
 
 ## .env setting
 
-.env is `.gitignored` and only accepted in local 
+.env is `.gitignored` and only accepted in local
 
 - DB_URL=jdbc:postgresql:`{DATABASE_URL}`
 - DB_USERNAME=`UserName`
 - DB_PASSWORD=`PassWord`
+- NAVER_GEOCODE_BASE_URL=`{Naver-GeoCoding-URL}`
+- NAVER_GEOCODE_CLIENT_ID=`ClientId`
+- NAVER_GEOCODE_CLIENT_SECRET=`ClientSecretKey`
 
 ## Network Flow
 

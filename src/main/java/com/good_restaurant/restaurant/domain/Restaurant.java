@@ -1,10 +1,15 @@
 package com.good_restaurant.restaurant.domain;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -16,39 +21,29 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Getter
 @Table(name = "restaurants", schema = "good_restaurant")
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Getter @NoArgsConstructor @AllArgsConstructor @Builder
 public class Restaurant {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "restaurant_id", nullable = false)
+	@Column(name = "restaurant_id")
 	private Long id;
 
-	@Size(max = 100)
 	@NotNull
+	@Size(max = 100)
 	@Column(name = "restaurant_name", nullable = false, length = 100)
 	private String restaurantName;
 
-	@Size(max = 255)
 	@NotNull
+	@Size(max = 255)
 	@Column(name = "address", nullable = false)
 	private String address;
 
 	@Size(max = 255)
-	@Column(name = "category")
-	private String category;
-
-	@Size(max = 255)
-	@Column(name = "menu")
-	private String menu;
-
-	@Size(max = 20)
-	@Column(name = "phone_number", length = 20)
-	private String phoneNumber;
+	@Enumerated(EnumType.STRING)
+	@Column(name = "category")      // TODO: nullable = false?
+	private Category category;
 
 	@Column(name = "lon", precision = 10, scale = 6)
 	private BigDecimal lon;
@@ -68,11 +63,7 @@ public class Restaurant {
 	@Column(name = "emd_kor_nm", length = 50)
 	private String emdKorNm;
 
-	@Size(max = 255)
-	@Column(name = "name")
-	private String name;
-
-	@Size(max = 255)
-	@Column(name = "number")
-	private String number;
+	@OneToOne(mappedBy = "restaurant", fetch = FetchType.LAZY,
+			  cascade = CascadeType.ALL, orphanRemoval = true)
+	private RestaurantDetail detail;
 }

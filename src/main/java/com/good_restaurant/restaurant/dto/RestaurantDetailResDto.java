@@ -1,5 +1,6 @@
 package com.good_restaurant.restaurant.dto;
 
+import com.good_restaurant.restaurant.domain.Category;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import lombok.AllArgsConstructor;
@@ -8,20 +9,21 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class RestaurantDetailResDto {
 
-	Long id;
+	// restaurant info
+	private final Long id;
 
-	String restaurantName;
-	String address;
+	private final String restaurantName;
+	private final String address;
+	private final Category category;
 
-	String category;
-	String menu;
-	String phoneNumber;
+	private final BigDecimal lon;
+	private final BigDecimal lat;
 
-	BigDecimal lon;
-	BigDecimal lat;
+	// restaurant_detail info
+	private final String menu;
+	private final String phoneNumber;
 }
