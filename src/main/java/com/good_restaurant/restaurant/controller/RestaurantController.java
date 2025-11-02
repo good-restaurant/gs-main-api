@@ -54,6 +54,19 @@ public class RestaurantController {
 	}
 
 	/**
+	 * 행정동 기반으로 주변 음식점 목록을 조회합니다.
+	 * @param emd 행정동
+	 * @return 주변 음식점 리스트
+	 */
+	@GetMapping("/emd")
+	public DataListResDto<RestaurantDetailResDto> findRestaurantsByEmd(
+			@RequestParam String emd) {
+		List<RestaurantDetailResDto> data =
+				restaurantService.findRestaurantsByEmd(emd);
+		return new DataListResDto<>(data);
+	}
+
+	/**
 	 * 음식점 데이터를 생성합니다.
 	 * @param dto 음식점 생성 요청 DTO
 	 */

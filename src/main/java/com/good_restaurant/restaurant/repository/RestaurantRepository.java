@@ -7,7 +7,6 @@ import java.util.List;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 public interface RestaurantRepository extends JpaRepository<Restaurant, Long> {
 
@@ -36,4 +35,15 @@ public interface RestaurantRepository extends JpaRepository<Restaurant, Long> {
 			BigDecimal centerLat, BigDecimal centerLon,
 			Pageable pageable
 	);
+
+	@Query("""
+	  select new com.good_restaurant.restaurant.dto.RestaurantDetailResDto(
+	    r.id, r.restaurantName, r.address, r.category, r.lon, r.lat,
+	    d.menu, d.phoneNumber
+	  )
+	  from Restaurant r
+	  left join r.detail d
+	  where r.emdKorNm = :emd
+	""")
+	List<RestaurantDetailResDto> findRestaurantsByEmd(String emd);
 }

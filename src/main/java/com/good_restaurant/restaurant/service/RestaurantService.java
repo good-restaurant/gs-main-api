@@ -81,6 +81,16 @@ public class RestaurantService {
 	}
 
 	/**
+	 * 도로명 주소를 기반으로 주변 음식점 목록을 조회합니다.
+	 * @param emd 도로명 주소
+	 * @return 주변 음식점 리스트
+	 */
+	@Transactional(readOnly = true)
+	public List<RestaurantDetailResDto> findRestaurantsByEmd(String emd) {
+		return restaurantRepository.findRestaurantsByEmd(emd);
+	}
+
+	/**
 	 * 음식점 데이터를 생성합니다.
 	 * @param dto 음식점 생성 요청 DTO
 	 */
