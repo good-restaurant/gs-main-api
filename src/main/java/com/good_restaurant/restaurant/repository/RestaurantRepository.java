@@ -11,14 +11,13 @@ import org.springframework.data.repository.query.Param;
 
 public interface RestaurantRepository extends JpaRepository<Restaurant, Long> {
 
-	@Query(value = """
-        SELECT *
-        FROM good_restaurant.restaurants r
-        WHERE r.lat IS NOT NULL AND r.lon IS NOT NULL
-        ORDER BY random()
-        LIMIT :limit
-        """, nativeQuery = true)
-	List<Restaurant> pickRandom(@Param("limit") int limit);
+	@Query("""
+	  select r
+	  from Restaurant r
+	  where r.lat is not null and r.lon is not null
+	  order by function('random')
+	""")
+	List<Restaurant> pickRandom(Pageable pageable);
 
 	@Query("""
 	  select new com.good_restaurant.restaurant.dto.RestaurantDetailResDto(

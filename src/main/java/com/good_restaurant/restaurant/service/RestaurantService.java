@@ -33,7 +33,9 @@ public class RestaurantService {
 	 */
 	@Transactional(readOnly = true)
 	public List<RestaurantCoordinateResDto> getEntireRestaurantCoordinates(int limit) {
-		List<RestaurantCoordinateResDto> restaurantCoordinates = restaurantRepository.pickRandom(limit)
+		Pageable limitPage = PageRequest.of(0, limit);
+
+		return restaurantRepository.pickRandom(limitPage)
 			.stream()
 			.map(restaurant -> RestaurantCoordinateResDto.builder()
 				.id(restaurant.getId())
@@ -45,7 +47,6 @@ public class RestaurantService {
 				.build()
 			)
 			.collect(Collectors.toList());
-		return restaurantCoordinates;
 	}
 
 	/**
