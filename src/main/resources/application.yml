@@ -19,3 +19,9 @@ spring:
 
 server:
   forward-headers-strategy: framework   # for https behind a proxy
+
+naver:
+  geocode:
+    base-url: ${NAVER_GEOCODE_BASE_URL}
+    client-id: ${NAVER_GEOCODE_CLIENT_ID}
+    client-secret: ${NAVER_GEOCODE_CLIENT_SECRET}
