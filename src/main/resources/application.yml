@@ -10,10 +10,12 @@ spring:
     import: optional:file:.env[.properties]
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate  # to prevent accidental schema changes in production-databases
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
         show_sql: true
 
+server:
+  forward-headers-strategy: framework   # for https behind a proxy
