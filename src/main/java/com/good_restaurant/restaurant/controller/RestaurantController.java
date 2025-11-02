@@ -60,9 +60,10 @@ public class RestaurantController {
 	 */
 	@GetMapping("/emd")
 	public DataListResDto<RestaurantDetailResDto> findRestaurantsByEmd(
-			@RequestParam String emd) {
+			@RequestParam String emd,
+			@RequestParam(defaultValue = "20") int limit) {
 		List<RestaurantDetailResDto> data =
-				restaurantService.findRestaurantsByEmd(emd);
+				restaurantService.findRestaurantsByEmd(emd, limit);
 		return new DataListResDto<>(data);
 	}
 

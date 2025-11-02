@@ -44,6 +44,7 @@ public interface RestaurantRepository extends JpaRepository<Restaurant, Long> {
 	  from Restaurant r
 	  left join r.detail d
 	  where r.emdKorNm = :emd
+	  order by function('random')
 	""")
-	List<RestaurantDetailResDto> findRestaurantsByEmd(String emd);
+	List<RestaurantDetailResDto> findRestaurantsByEmd(String emd, Pageable pageable);
 }

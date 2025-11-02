@@ -86,8 +86,9 @@ public class RestaurantService {
 	 * @return 주변 음식점 리스트
 	 */
 	@Transactional(readOnly = true)
-	public List<RestaurantDetailResDto> findRestaurantsByEmd(String emd) {
-		return restaurantRepository.findRestaurantsByEmd(emd);
+	public List<RestaurantDetailResDto> findRestaurantsByEmd(String emd, int limit) {
+		Pageable limitPage = PageRequest.of(0, limit);
+		return restaurantRepository.findRestaurantsByEmd(emd, limitPage);
 	}
 
 	/**
