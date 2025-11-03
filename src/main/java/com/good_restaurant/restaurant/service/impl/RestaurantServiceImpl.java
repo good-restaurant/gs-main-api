@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -38,8 +39,8 @@ public class RestaurantServiceImpl implements RestaurantService {
     private final RestaurantRepository restaurantRepository;
     private final RestaurantDetailRepository restaurantDetailRepository;
     private final GeocodingService geocodingService;
-
-    /**
+	
+	/**
      * 전체 음식점 좌표를 랜덤으로 조회합니다.
      * @param limit 조회할 음식점 좌표 제한 개수
      * @return 음식점 좌표 리스트

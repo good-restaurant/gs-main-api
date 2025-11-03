@@ -30,6 +30,7 @@ public class GeocodingServiceImpl implements GeocodingService {
 
     private static final int COORD_SCALE = 6;   // Coordinate decimal places
     private final GeocodingConfig geoConfig;
+	
 
     @Override
     public GeocodeResultDto geocode(String address) {
