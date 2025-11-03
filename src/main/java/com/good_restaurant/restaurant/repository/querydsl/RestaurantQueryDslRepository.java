@@ -8,7 +8,6 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public interface RestaurantQueryDslRepository {
-	List<Restaurant> findRandomRestaurants(Pageable pageable);
 	
 	List<Restaurant> findNearbyRestaurantsWithDetail(
 			BigDecimal minLat, BigDecimal maxLat,
@@ -21,4 +20,6 @@ public interface RestaurantQueryDslRepository {
 			String emd,
 			Pageable pageable
 	);
+	
+	List<Restaurant> findRandomRestaurantsQueryDsl(Pageable limitPage);
 }
