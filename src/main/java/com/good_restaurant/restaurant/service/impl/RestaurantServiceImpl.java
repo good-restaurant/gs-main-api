@@ -39,6 +39,7 @@ public class RestaurantServiceImpl implements RestaurantService {
     private final RestaurantRepository restaurantRepository;
     private final RestaurantDetailRepository restaurantDetailRepository;
     private final GeocodingService geocodingService;
+    private final com.good_restaurant.restaurant.mapper.RestaurantMapper restaurantMapper;
 	
 	/**
      * 전체 음식점 좌표를 랜덤으로 조회합니다.
@@ -112,51 +113,42 @@ public class RestaurantServiceImpl implements RestaurantService {
 	 * QueryDSL 기반으로 전체 음식점 좌표를 랜덤 조회합니다.
 	 * (기존 JPQL pickRandom 대체)
 	 */
-	public List<RestaurantCoordinateResDto> getEntireRestaurantCoordinatesQueryDsl(int limit) {
-		Pageable limitPage = PageRequest.of(0, limit);
-		
-		return restaurantRepository.findRandomRestaurants(limitPage)
-				       .stream()
-				       .map(r -> RestaurantCoordinateResDto.builder()
-						                 .id(r.getId())
-						                 .restaurantName(r.getRestaurantName())
-						                 .address(r.getAddress())
-						                 .category(r.getCategory())
-						                 .lon(r.getLon())
-						                 .lat(r.getLat())
-						                 .build())
-				       .collect(Collectors.toList());
-	}
+ public List<RestaurantCoordinateResDto> getEntireRestaurantCoordinatesQueryDsl(int limit) {
+        Pageable limitPage = PageRequest.of(0, limit);
+        return restaurantMapper.toCoordinateDtoList(restaurantRepository.findRandomRestaurants(limitPage));
+    }
 	
-	/**
-	 * QueryDSL 기반으로 도로명 주소 중심 주변 음식점 상세 조회
-	 * (기존 findNearbyWithDetail 대체)
-	 */
-	public List<Restaurant> getNearbyRestaurantsQueryDsl(String address, double radius, int limit) {
-		GeocodeResultDto geoResult = geocodingService.geocode(address);
-		if (geoResult == null) return Collections.emptyList();
-		
-		BigDecimal minLat = geoResult.getLat().subtract(BigDecimal.valueOf(radius));
-		BigDecimal maxLat = geoResult.getLat().add(BigDecimal.valueOf(radius));
-		BigDecimal minLon = geoResult.getLon().subtract(BigDecimal.valueOf(radius));
-		BigDecimal maxLon = geoResult.getLon().add(BigDecimal.valueOf(radius));
-		Pageable limitPage = PageRequest.of(0, limit);
-		
-		return restaurantRepository.findNearbyRestaurantsWithDetail(
-				minLat, maxLat, minLon, maxLon,
-				geoResult.getLat(), geoResult.getLon(),
-				limitPage
-		);
-	}
-	
-	/**
-	 * QueryDSL 기반으로 행정동(EMD) 기준 음식점 상세 목록을 랜덤 조회합니다.
-	 * (기존 findRestaurantsByEmd 대체)
-	 */
-	public List<Restaurant> findRestaurantsByEmdQueryDsl(String emd, int limit) {
-		Pageable limitPage = PageRequest.of(0, limit);
-		return restaurantRepository.findRestaurantsByEmdRandom(emd, limitPage);
-	}
+ /**
+  * QueryDSL 기반으로 도로명 주소 중심 주변 음식점 상세 조회
+  * (기존 findNearbyWithDetail 대체)
+  */
+ public List<RestaurantDetailResDto> getNearbyRestaurantsQueryDsl(String address, double radius, int limit) {
+     GeocodeResultDto geoResult = geocodingService.geocode(address);
+     if (geoResult == null) return Collections.emptyList();
+        
+     BigDecimal minLat = geoResult.getLat().subtract(BigDecimal.valueOf(radius));
+     BigDecimal maxLat = geoResult.getLat().add(BigDecimal.valueOf(radius));
+     BigDecimal minLon = geoResult.getLon().subtract(BigDecimal.valueOf(radius));
+     BigDecimal maxLon = geoResult.getLon().add(BigDecimal.valueOf(radius));
+     Pageable limitPage = PageRequest.of(0, limit);
+        
+     return restaurantMapper.toDetailDtoList(
+             restaurantRepository.findNearbyRestaurantsWithDetail(
+                 minLat, maxLat, minLon, maxLon,
+                 geoResult.getLat(), geoResult.getLon(),
+                 limitPage
+             )
+     );
+ }
+    
+ /**
+  * QueryDSL 기반으로 행정동(EMD) 기준 음식점 상세 목록을 랜덤 조회합니다.
+  * (기존 findRestaurantsByEmd 대체)
+  */
+ public List<RestaurantDetailResDto> findRestaurantsByEmdQueryDsl(String emd, int limit) {
+     Pageable limitPage = PageRequest.of(0, limit);
+     return restaurantMapper.toDetailDtoList(restaurantRepository.findRestaurantsByEmdRandom(emd, limitPage));
+ }
 	
 	/**
 	 * 음식점 데이터를 생성합니다.
