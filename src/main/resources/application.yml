@@ -20,6 +20,7 @@ spring:
 server:
   forward-headers-strategy: framework   # for https behind a proxy
 
+## naver api key - 네이버 지오코딩용 API
 naver:
   geocode:
     base-url: ${NAVER_GEOCODE_BASE_URL}
