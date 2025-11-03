@@ -1,6 +1,5 @@
 package com.good_restaurant.restaurant.controller;
 
-import com.good_restaurant.restaurant.domain.Restaurant;
 import com.good_restaurant.restaurant.dto.*;
 import com.good_restaurant.restaurant.service.RestaurantService;
 import lombok.RequiredArgsConstructor;
@@ -39,9 +38,7 @@ public class RestaurantControllerV2 {
 			@RequestParam String address,
 			@RequestParam(defaultValue = "0.1") double radius,
 			@RequestParam(defaultValue = "20") int limit) {
-		List<Restaurant> data =
-				restaurantService.getNearbyRestaurantsQueryDsl(address, radius, limit);
-		return restaurantService.;
+		return restaurantService.getNearbyRestaurantsQueryDsl(address, radius, limit);
 	}
 
 	/**
@@ -50,7 +47,7 @@ public class RestaurantControllerV2 {
 	 * @return 주변 음식점 리스트
 	 */
 	@GetMapping("/emd")
-	public List<Restaurant> findRestaurantsByEmd(
+	public List<RestaurantDetailResDto> findRestaurantsByEmd(
 			@RequestParam String emd,
 			@RequestParam(defaultValue = "20") int limit) {
 		return restaurantService.findRestaurantsByEmdQueryDsl(emd, limit);
