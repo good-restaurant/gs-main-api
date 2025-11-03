@@ -1,5 +1,6 @@
 package com.good_restaurant.restaurant.service;
 
+import com.good_restaurant.restaurant.domain.Restaurant;
 import com.good_restaurant.restaurant.dto.RestaurantCoordinateResDto;
 import com.good_restaurant.restaurant.dto.RestaurantCreateReqDto;
 import com.good_restaurant.restaurant.dto.RestaurantDetailResDto;
@@ -52,4 +53,22 @@ public interface RestaurantService {
      * @param dto 음식점 생성 요청 DTO
      */
     void createRestaurantData(RestaurantCreateReqDto dto);
+	
+	/**
+	 * QueryDSL 기반으로 도로명 주소 중심 주변 음식점 상세 조회
+	 * (기존 findNearbyWithDetail 대체)
+	 */
+	List<Restaurant> getNearbyRestaurantsQueryDsl(String address, double radius, int limit);
+	
+	/**
+	 * QueryDSL 기반으로 행정동(EMD) 기준 음식점 상세 목록을 랜덤 조회합니다.
+	 * (기존 findRestaurantsByEmd 대체)
+	 */
+	List<Restaurant> findRestaurantsByEmdQueryDsl(String emd, int limit);
+	
+	/**
+	 * QueryDSL 기반으로 전체 음식점 좌표를 랜덤 조회합니다.
+	 * (기존 JPQL pickRandom 대체)
+	 */
+	List<Restaurant> getEntireRestaurantCoordinatesQueryDsl(int limit);
 }

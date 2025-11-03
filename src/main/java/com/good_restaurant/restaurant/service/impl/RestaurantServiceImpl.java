@@ -107,28 +107,79 @@ public class RestaurantServiceImpl implements RestaurantService {
         Pageable limitPage = PageRequest.of(0, limit);
         return restaurantRepository.findRestaurantsByEmd(emd, limitPage);
     }
-
-    /**
-     * 음식점 데이터를 생성합니다.
-     * @param dto 음식점 생성 요청 DTO
-     */
-    @Override
-    @Transactional
-    public void createRestaurantData(RestaurantCreateReqDto dto) {
-        Restaurant newRestaurant = restaurantRepository.save(Restaurant.builder()
-                .restaurantName(dto.getRestaurantName())
-                .address(dto.getAddress())
-                .category(dto.getCategory())
-                .lon(dto.getLon())
-                .lat(dto.getLat())
-                .build()
-        );
-
-        restaurantDetailRepository.save(RestaurantDetail.builder()
-                .restaurant(newRestaurant)
-                .menu(dto.getMenu())
-                .phoneNumber(dto.getPhoneNumber())
-                .build()
-        );
-    }
+	
+	/**
+	 * QueryDSL 기반으로 전체 음식점 좌표를 랜덤 조회합니다.
+	 * (기존 JPQL pickRandom 대체)
+	 */
+	public List<RestaurantCoordinateResDto> getEntireRestaurantCoordinatesQueryDsl(int limit) {
+		Pageable limitPage = PageRequest.of(0, limit);
+		
+		return restaurantRepository.findRandomRestaurants(limitPage)
+				       .stream()
+				       .map(r -> RestaurantCoordinateResDto.builder()
+						                 .id(r.getId())
+						                 .restaurantName(r.getRestaurantName())
+						                 .address(r.getAddress())
+						                 .category(r.getCategory())
+						                 .lon(r.getLon())
+						                 .lat(r.getLat())
+						                 .build())
+				       .collect(Collectors.toList());
+	}
+	
+	/**
+	 * QueryDSL 기반으로 도로명 주소 중심 주변 음식점 상세 조회
+	 * (기존 findNearbyWithDetail 대체)
+	 */
+	public List<Restaurant> getNearbyRestaurantsQueryDsl(String address, double radius, int limit) {
+		GeocodeResultDto geoResult = geocodingService.geocode(address);
+		if (geoResult == null) return Collections.emptyList();
+		
+		BigDecimal minLat = geoResult.getLat().subtract(BigDecimal.valueOf(radius));
+		BigDecimal maxLat = geoResult.getLat().add(BigDecimal.valueOf(radius));
+		BigDecimal minLon = geoResult.getLon().subtract(BigDecimal.valueOf(radius));
+		BigDecimal maxLon = geoResult.getLon().add(BigDecimal.valueOf(radius));
+		Pageable limitPage = PageRequest.of(0, limit);
+		
+		return restaurantRepository.findNearbyRestaurantsWithDetail(
+				minLat, maxLat, minLon, maxLon,
+				geoResult.getLat(), geoResult.getLon(),
+				limitPage
+		);
+	}
+	
+	/**
+	 * QueryDSL 기반으로 행정동(EMD) 기준 음식점 상세 목록을 랜덤 조회합니다.
+	 * (기존 findRestaurantsByEmd 대체)
+	 */
+	public List<Restaurant> findRestaurantsByEmdQueryDsl(String emd, int limit) {
+		Pageable limitPage = PageRequest.of(0, limit);
+		return restaurantRepository.findRestaurantsByEmdRandom(emd, limitPage);
+	}
+	
+	/**
+	 * 음식점 데이터를 생성합니다.
+	 *
+	 * @param dto 음식점 생성 요청 DTO
+	 */
+	@Override
+	@Transactional
+	public void createRestaurantData(RestaurantCreateReqDto dto) {
+		Restaurant newRestaurant = restaurantRepository.save(Restaurant.builder()
+				                                                     .restaurantName(dto.getRestaurantName())
+				                                                     .address(dto.getAddress())
+				                                                     .category(dto.getCategory())
+				                                                     .lon(dto.getLon())
+				                                                     .lat(dto.getLat())
+				                                                     .build()
+		);
+		
+		restaurantDetailRepository.save(RestaurantDetail.builder()
+				                                .restaurant(newRestaurant)
+				                                .menu(dto.getMenu())
+				                                .phoneNumber(dto.getPhoneNumber())
+				                                .build()
+		);
+	}
 }
