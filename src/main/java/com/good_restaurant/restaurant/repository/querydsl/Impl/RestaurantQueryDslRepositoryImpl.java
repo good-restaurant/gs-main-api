@@ -1,4 +1,4 @@
-package com.good_restaurant.restaurant.repository;
+package com.good_restaurant.restaurant.repository.querydsl.Impl;
 
 import com.good_restaurant.restaurant.domain.QRestaurant;
 import com.good_restaurant.restaurant.domain.QRestaurantDetail;
@@ -15,7 +15,7 @@ import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
-public class RestaurantQueryRepository {
+public class RestaurantQueryDslRepositoryImpl {
 	
 	private final JPAQueryFactory queryFactory;
 	
