@@ -1,6 +1,5 @@
 package com.good_restaurant.restaurant.service;
 
-import com.good_restaurant.restaurant.domain.Restaurant;
 import com.good_restaurant.restaurant.dto.RestaurantCoordinateResDto;
 import com.good_restaurant.restaurant.dto.RestaurantCreateReqDto;
 import com.good_restaurant.restaurant.dto.RestaurantDetailResDto;
@@ -70,5 +69,5 @@ public interface RestaurantService {
 	 * QueryDSL 기반으로 전체 음식점 좌표를 랜덤 조회합니다.
 	 * (기존 JPQL pickRandom 대체)
 	 */
-	List<RestaurantCoordinateResDto> getEntireRestaurantCoordinatesQueryDsl(int limit);
+	List<RestaurantCoordinateResDto> getEntireRestaurantCoordinatesApplication(int limit);
 }

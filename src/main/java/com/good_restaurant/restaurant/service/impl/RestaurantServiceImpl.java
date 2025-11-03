@@ -110,15 +110,31 @@ public class RestaurantServiceImpl implements RestaurantService {
     }
 	
 	/**
-	 * QueryDSL 기반으로 전체 음식점 좌표를 랜덤 조회합니다.
+	 * 어플리케이션 레이어에서 랜덤 추출 및 DTO 변환 처리
 	 * (기존 JPQL pickRandom 대체)
 	 */
- public List<RestaurantCoordinateResDto> getEntireRestaurantCoordinatesQueryDsl(int limit) {
-        Pageable limitPage = PageRequest.of(0, limit);
-        return restaurantMapper.toCoordinateDtoList(restaurantRepository.findRandomRestaurants(limitPage));
-    }
+	@Override
+	@Transactional(readOnly = true)
+	public List<RestaurantCoordinateResDto> getEntireRestaurantCoordinatesApplication(int limit) {
+		
+		// 1️ 모든 음식점 로드
+		List<Restaurant> allRestaurants = restaurantRepository.findAll().stream()
+				                                  .collect(Collectors.toList());
+		
+		// 2 섞기 (DB 대신 애플리케이션에서 랜덤 정렬)
+		Collections.shuffle(allRestaurants);
+		
+		// 3 상위 limit개만 추출
+		List<Restaurant> limitedRestaurants = allRestaurants.stream()
+				                                      .limit(limit)
+				                                      .toList();
+		
+		// 4 DTO 매핑
+		return restaurantMapper.toCoordinateDtoList(limitedRestaurants);
+	}
 	
- /**
+	
+	/**
   * QueryDSL 기반으로 도로명 주소 중심 주변 음식점 상세 조회
   * (기존 findNearbyWithDetail 대체)
   */
