@@ -43,10 +43,11 @@ deploy:
 
     # 런타임 env 파일
     - |
-      printf "DB_URL=%s\nDB_USERNAME=%s\nDB_PASSWORD=%s\nNAVER_GEOCODE_BASE_URL=%s\NAVER_GEOCODE_CLIENT_ID=%s\nNAVER_GEOCODE_CLIENT_SECRET=%s\n" \
-        "$DB_URL" "$DB_USERNAME" "$DB_PASSWORD" "$NAVER_GEOCODE_BASE_URL" "$NAVER_GEOCODE_CLIENT_ID" "$NAVER_GEOCODE_CLIENT_SECRET" > .env.runtime
+      printf "DB_URL=%s\nDB_USERNAME=%s\nDB_PASSWORD=%s\nNAVER_GEOCODE_BASE_URL=%s\nNAVER_GEOCODE_CLIENT_ID=%s\nNAVER_GEOCODE_CLIENT_SECRET=%s\n" \
+      "$DB_URL" "$DB_USERNAME" "$DB_PASSWORD" "$NAVER_GEOCODE_BASE_URL" "$NAVER_GEOCODE_CLIENT_ID" "$NAVER_GEOCODE_CLIENT_SECRET" > .env.runtime
+  
 
-    # 이미지 override + build 제거
+  # 이미지 override + build 제거
     - |
       cat > compose.ci.yaml <<'YAML'
       services:
