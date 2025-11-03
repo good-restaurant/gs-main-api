@@ -30,7 +30,7 @@ public class RestaurantDetail {
 	private Long id;
 
 	@NotNull
-	@OneToOne(fetch = FetchType.LAZY, optional = false)
+	@OneToOne(optional = false)
 	@OnDelete(action = OnDeleteAction.CASCADE)
 	@JoinColumn(name = "restaurant_id", nullable = false, unique = true)    // TODO: check unique
 	private Restaurant restaurant;
