@@ -39,20 +39,21 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-    // queryDSL 의존성 추가
-    // 주의: openfeign fork 임
+    // MapStruct (annotation processing)
+    implementation 'org.mapstruct:mapstruct:1.6.2'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.2'
+    // Ensure Lombok + MapStruct work together
+    annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+
+    // QueryDSL 의존성 추가 (openfeign fork)
     implementation("io.github.openfeign.querydsl:querydsl-jpa:7.1") {
         exclude group: "org.hibernate", module: "hibernate-core"
     }
-
-
     annotationProcessor "io.github.openfeign.querydsl:querydsl-apt:7.1:jpa"
-
 
 //    // QClass 생성용 annotation processor 경로 추가
 //    annotationProcessor "jakarta.persistence:jakarta.persistence-api:3.2.0"
 //    annotationProcessor "jakarta.annotation:jakarta.annotation-api:3.0.0"
-
 
     // Netty native transport dependencies for different platforms
 	runtimeOnly 'io.netty:netty-resolver-dns-native-macos:4.1.114.Final:osx-aarch_64'
