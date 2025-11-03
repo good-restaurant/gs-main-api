@@ -26,13 +26,15 @@ public class RestaurantQueryDslRepositoryImpl implements RestaurantQueryDslRepos
 	/**
 	 * ✅ 1. 랜덤 음식점 좌표 조회 (fetch join 없음, N+1 없음)
 	 * - detail 미접근 시 추가 select 발생하지 않음
+	 * 1000개 이상이면 안 좋기 때문에 Deprecated
 	 */
+	@Deprecated
 	@Override
-	public List<Restaurant> findRandomRestaurants(Pageable pageable) {
+	public List<Restaurant> findRandomRestaurantsQueryDsl(Pageable pageable) {
 		return queryFactory
 				       .selectFrom(r)
 				       .where(r.lat.isNotNull().and(r.lon.isNotNull()))
-				       .orderBy(Expressions.numberTemplate(Double.class, "function('random')").asc())
+				       .orderBy(Expressions.numberTemplate(Double.class, "random()").asc()) // PostgreSQL 내장함수
 				       .offset(pageable.getOffset())
 				       .limit(pageable.getPageSize())
 				       .fetch();
@@ -51,17 +53,16 @@ public class RestaurantQueryDslRepositoryImpl implements RestaurantQueryDslRepos
 			Pageable pageable
 	) {
 		return queryFactory
-				       .selectFrom(r).distinct()
+				       .selectFrom(r)
 				       .leftJoin(r.detail, d).fetchJoin()
-				       .where(
-						       r.lat.between(minLat, maxLat)
-								       .and(r.lon.between(minLon, maxLon))
+				       .where(r.lat.between(minLat, maxLat)
+						              .and(r.lon.between(minLon, maxLon)))
+				       .orderBy(
+						       r.id.asc(), // DISTINCT ON 에 포함될 키
+						       Expressions.numberTemplate(Double.class,
+								       "(power({0} - {1}, 2) + power({2} - {3}, 2))",
+								       r.lat, centerLat, r.lon, centerLon).asc()
 				       )
-				       .orderBy(Expressions.numberTemplate(Double.class,
-						       "(power({0} - {1}, 2) + power({2} - {3}, 2))",
-						       r.lat, centerLat, r.lon, centerLon).asc())
-				       .offset(pageable.getOffset())
-				       .limit(pageable.getPageSize())
 				       .fetch();
 	}
 	
