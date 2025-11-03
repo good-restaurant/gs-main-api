@@ -20,10 +20,10 @@ public class RestaurantControllerV2 {
 	 * @return 음식점 좌표 리스트
 	 */
 	@GetMapping("/all")
-	public DataListResDto<RestaurantCoordinateResDto> getEntireRestaurantCoordinates(
+	public List<RestaurantCoordinateResDto> getEntireRestaurantCoordinates(
 			@RequestParam(defaultValue = "100") int limit) {
-		List<RestaurantCoordinateResDto> data = restaurantService.getEntireRestaurantCoordinatesQueryDsl(limit);
-		return new DataListResDto<>(data);
+		List<RestaurantCoordinateResDto> data = restaurantService.getEntireRestaurantCoordinatesApplication(limit);
+		return data;
 	}
 
 	/**
