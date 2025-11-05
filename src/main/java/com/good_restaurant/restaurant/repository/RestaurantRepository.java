@@ -1,15 +1,21 @@
 package com.good_restaurant.restaurant.repository;
 
-import com.good_restaurant.restaurant.domain.Restaurant;
 import com.good_restaurant.restaurant.dto.RestaurantDetailResDto;
 import java.math.BigDecimal;
 import java.util.List;
+
+import com.good_restaurant.restaurant.repository.querydsl.RestaurantQueryDslRepository;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-public interface RestaurantRepository extends JpaRepository<Restaurant, Long> {
-
+public interface RestaurantRepository extends JpaRepository<Restaurant, Long>, RestaurantQueryDslRepository {
+	
+	@Override
+	@EntityGraph(attributePaths = "detail")
+	List<Restaurant> findAll();
+	
 	@Query("""
 	  select r
 	  from Restaurant r
