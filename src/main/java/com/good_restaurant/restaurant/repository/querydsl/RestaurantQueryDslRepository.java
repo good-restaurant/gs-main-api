@@ -1,5 +1,6 @@
 package com.good_restaurant.restaurant.repository.querydsl;
 
+import com.good_restaurant.restaurant.domain.Restaurant;
 import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;

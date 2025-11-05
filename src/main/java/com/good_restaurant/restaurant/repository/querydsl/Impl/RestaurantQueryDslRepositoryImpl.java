@@ -1,7 +1,7 @@
 package com.good_restaurant.restaurant.repository.querydsl.Impl;
 
 import com.good_restaurant.restaurant.domain.QRestaurant;
-import com.good_restaurant.restaurant.domain.QRestaurantDetail;
+//import com.good_restaurant.restaurant.domain.QRestaurantDetail;
 import com.good_restaurant.restaurant.domain.Restaurant;
 import com.good_restaurant.restaurant.repository.querydsl.RestaurantQueryDslRepository;
 import com.querydsl.core.types.dsl.Expressions;
@@ -21,7 +21,7 @@ public class RestaurantQueryDslRepositoryImpl implements RestaurantQueryDslRepos
 	private final JPAQueryFactory queryFactory;
 	
 	private final QRestaurant r = QRestaurant.restaurant;
-	private final QRestaurantDetail d = QRestaurantDetail.restaurantDetail;
+//	private final QRestaurantDetail d = QRestaurantDetail.restaurantDetail;
 	
 	/**
 	 * ✅ 1. 랜덤 음식점 좌표 조회 (fetch join 없음, N+1 없음)
@@ -54,7 +54,6 @@ public class RestaurantQueryDslRepositoryImpl implements RestaurantQueryDslRepos
 	) {
 		return queryFactory
 				       .selectFrom(r)
-				       .leftJoin(r.detail, d).fetchJoin()
 				       .where(r.lat.between(minLat, maxLat)
 						              .and(r.lon.between(minLon, maxLon)))
 				       .orderBy(
@@ -88,7 +87,6 @@ public class RestaurantQueryDslRepositoryImpl implements RestaurantQueryDslRepos
 		
 		return queryFactory
 				       .selectFrom(r).distinct()
-				       .leftJoin(r.detail, d).fetchJoin()
 				       .where(r.emdKorNm.eq(emd)
 						              .and(r.lat.isNotNull())
 						              .and(r.lon.isNotNull()))
