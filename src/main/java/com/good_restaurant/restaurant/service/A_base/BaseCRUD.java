@@ -58,13 +58,29 @@ public interface BaseCRUD<T,ID> {
         }
         return getRepository().save(entity);
     }
-
+	
     @Transactional
     default T update(T entity, ID id) throws MergePropertyException {
         return updateById(id, entity);
     }
-
-    @Transactional
+	
+	/**
+	 * 소스 객체의 필드 값을 타겟 객체에 병합합니다.
+	 * 타겟 객체의 필드 값이 null 이고 소스 객체의 필드 값이 null 이 아닌 경우에만 업데이트합니다.
+	 * 고려사항 몇 개
+	 * 1. 인터페이스 내에 있는 default 로직으로 인해 public 으로 할 수 밖에 없지만,
+	 * 실제 사용은 protected 처럼 내부 메소드로 사용하세요.
+	 * 2. 이 말은 컨트롤러가 직접 "updateRule" 을 사용하면 안된다는 의미입니다.
+	 * 보통 update 를 하면 자연스럽게 호출되기 때문에 큰 문제가 안될 겁니다.
+	 *
+	 * @param source 소스 객체
+	 * @param target 타겟 객체
+	 * @return 업데이트된 타겟 객체
+	 * @throws MergePropertyException 병합 과정에서 발생한 예외
+	 */
+	T updateRule(T source, T target) throws MergePropertyException;
+	
+	@Transactional
     default List<T> saveAll(Iterable<T> entities) {
 
         // 1. 저장하려는 엔티티의 ID 추출
@@ -104,38 +120,24 @@ public interface BaseCRUD<T,ID> {
         return getRepository().count();
     }
 
-    default List<T> queryByQBE(Integer key,String cd, String name, Class<T> entityClass) {
-        // QBE 쿼리 기본 메소드
-        T entity = getQBEEntity(key, cd, name);
-        ExampleMatcher matcher = ExampleMatcher.matching()
-                .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING) // LIKE '%value%' 조건
-                .withIgnoreCase(); // 대소문자 무시
-
-        Example<T> example = Example.of(entity, matcher);
-        return getRepository().findAll(example);
-    }
+//    default List<T> queryByQBE(Integer key,String cd, String name, Class<T> entityClass) {
+//        // QBE 쿼리 기본 메소드
+//        T entity = getQBEEntity(key, cd, name);
+//        ExampleMatcher matcher = ExampleMatcher.matching()
+//                .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING) // LIKE '%value%' 조건
+//                .withIgnoreCase(); // 대소문자 무시
+//
+//        Example<T> example = Example.of(entity, matcher);
+//        return getRepository().findAll(example);
+//    }
 
     //</editor-fold>
 
     //<editor-fold desc="구현이 필요한 인터페이스">
 
-    // 제네릭 컨트롤러 인터페이스에서 클래스 정보를 확인해야 할 때, 리플렉션 혹은 개별 최종 서비스에서 불러옴
-    Class<T> getEntityClass();
-
     // 필요한 repository 를 각 서비스가 제공하도록 정의
     JpaRepository<T, ID> getRepository();
-
-    /**
-     * 기본 QBE 로직으로 확인하고자 하는 entity 의 성격을 통해 조회를 진행합니다.
-     * <p>key / cd / name 의 용도가 구현체마다 다릅니다. 개별 오버라이드를 통해 설명을 확인합니다.</p>
-     *
-     * @param key 보통 상위 객체나 연관객체의 key 값
-     * @param cd 대상 객체의 코드 값 (있는경우)
-     * @param name 대상 객체의 이름 값 (있는경우)
-     * @return 조회하고자 하는 객체의 형태 (sql 의 Like 조건과 유사하게 검색, QBE 로직에 따라 다름)
-     */
-    T getQBEEntity(Integer key, String cd, String name);
-
+	
     T delete(ID id);
 
     // 엔티티의 ID를 가져오는 메소드
@@ -144,22 +146,6 @@ public interface BaseCRUD<T,ID> {
     //</editor-fold>
 
     //<editor-fold desc="헬퍼, 규칙 메소드">
-
-    /**
-     * 소스 객체의 필드 값을 타겟 객체에 병합합니다.
-     * 타겟 객체의 필드 값이 null 이고 소스 객체의 필드 값이 null 이 아닌 경우에만 업데이트합니다.
-     * 고려사항 몇 개
-     *      1. 인터페이스 내에 있는 default 로직으로 인해 public 으로 할 수 밖에 없지만,
-     *          실제 사용은 protected 처럼 내부 메소드로 사용하세요.
-     *      2. 이 말은 컨트롤러가 직접 "updateRule" 을 사용하면 안된다는 의미입니다.
-     *          보통 update 를 하면 자연스럽게 호출되기 때문에 큰 문제가 안될 겁니다.
-     *
-     * @param source 소스 객체
-     * @param target 타겟 객체
-     * @return 업데이트된 타겟 객체
-     * @throws MergePropertyException 병합 과정에서 발생한 예외
-     */
-    T updateRule(T source, T target) throws MergePropertyException;
 
     /**
      * ID로 엔티티를 찾고 업데이트하는 기본 로직을 제공합니다.
@@ -199,7 +185,6 @@ public interface BaseCRUD<T,ID> {
     default boolean idCheck(T entity, ID id) {
         return getEntityId(entity).equals(id);
     }
-
-    //</editor-fold>
+	//</editor-fold>
 
 }
