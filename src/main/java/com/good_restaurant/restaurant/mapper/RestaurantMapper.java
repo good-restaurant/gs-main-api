@@ -41,4 +41,8 @@ public interface RestaurantMapper {
 	Restaurant partialUpdate(RestaurantCoordinateResDto restaurantCoordinateResDto, @MappingTarget Restaurant restaurant);
 	
 	List<RestaurantCoordinateResDto> toDto3(List<Restaurant> restaurants);
+	
+	List<RestaurantCoordinateResDto> toDto(List<Restaurant> limitedRestaurants);
+	
+	List<RestaurantDetailResDto> toDto2(List<Restaurant> nearbyRestaurantsWithDetail);
 }
