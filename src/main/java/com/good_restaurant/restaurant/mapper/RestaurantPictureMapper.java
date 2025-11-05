@@ -1,15 +1,15 @@
-package com.good_restaurant.restaurant.mapper;
-
-import com.good_restaurant.restaurant.domain.RestaurantPicture;
-import com.good_restaurant.restaurant.dto.RestaurantPictureDto;
-import org.mapstruct.*;
-
-@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING, uses = {RestaurantMapper.class})
-public interface RestaurantPictureMapper {
-	RestaurantPicture toEntity(RestaurantPictureDto restaurantPictureDto);
+	package com.good_restaurant.restaurant.mapper;
 	
-	RestaurantPictureDto toDto(RestaurantPicture restaurantPicture);
+	import com.good_restaurant.restaurant.domain.RestaurantPicture;
+	import com.good_restaurant.restaurant.dto.RestaurantPictureDto;
+	import org.mapstruct.*;
 	
-	@BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-	RestaurantPicture partialUpdate(RestaurantPictureDto restaurantPictureDto, @MappingTarget RestaurantPicture restaurantPicture);
-}
+	@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING)
+	public interface RestaurantPictureMapper {
+		@Mapping(target = "restaurant.id", source = "restaurantId")
+		RestaurantPicture toEntity(RestaurantPictureDto dto);
+		
+		@Mapping(target = "restaurantId", source = "restaurant.id")
+		RestaurantPictureDto toDto(RestaurantPicture entity);
+		
+	}

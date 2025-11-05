@@ -9,6 +9,9 @@ import java.util.UUID;
 /**
  * DTO for {@link RestaurantPicture}
  */
-public record RestaurantPictureDto(Long id, @NotNull UUID pictureUuid,
-                                   RestaurantIdDto restaurant) implements Serializable {
+public record RestaurantPictureDto(
+		Long id,
+		@NotNull UUID pictureUuid,
+		Long restaurantId
+) implements Serializable {
 }
