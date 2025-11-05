@@ -57,6 +57,8 @@ public interface RestaurantMapper {
 	
 	RestaurantFullDto toDto4(Restaurant restaurant);
 	
+	List<RestaurantFullDto> toDto4(List<Restaurant> restaurant);
+	
 	@BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 	Restaurant partialUpdate(RestaurantFullDto restaurantFullDto, @MappingTarget Restaurant restaurant);
 	

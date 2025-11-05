@@ -42,6 +42,19 @@ public class RestaurantServiceV3Impl implements RestaurantServiceV3, BaseCRUD<Re
 		return entity.getId();
 	}
 	
+//	@Override
+//	public List<Restaurant> getAll() {
+//		List<Restaurant> restaurants = repository.findAll();
+//
+//		// Batch size initialize
+//		restaurants.forEach(r -> {
+//			r.getRestaurantMenus().size();
+//			r.getRestaurantPictures().size();
+//			r.getRestaurantComments().size();
+//		});
+//		return restaurants;
+//	}
+	
 	@Override
 	public Restaurant updateRule(Restaurant source, Restaurant target) throws MergePropertyException {
 		return serviceHelper.updateRule(source, target);

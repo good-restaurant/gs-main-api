@@ -108,9 +108,24 @@ public class RestaurantControllerV3 {
 	 */
 	@GetMapping("/view/{id}")
 	public ResponseEntity<RestaurantFullDto> findRestaurantsById(
-			@RequestParam(defaultValue = "20") Long id) {
+			@RequestParam(defaultValue = "1342") Long id) {
 		Restaurant restaurant = serviceV3.getById(id);
 		return ResponseEntity.ok(mapper.toDto4(restaurant));
 	}
 	
+	/**
+	 * 전체 음식점 좌표를 랜덤으로 조회합니다.
+	 *
+	 * @param limit 조회할 음식점 좌표 개수(기본값: 100)
+	 * @return 음식점 좌표 리스트
+	 */
+	@GetMapping("/random")
+	public ResponseEntity<List<RestaurantFullDto>> getRandomFullRestaurantList(
+			@RequestParam(defaultValue = "100") Integer limit) {
+		// 일단 전부 가져오기
+		List<Restaurant> restaurantList = serviceV3.getAll();
+		List<Restaurant> filteredRestaurantByLimit = serviceV3.limitFilter(limit, restaurantList);
+		
+		return ResponseEntity.ok(mapper.toDto4(filteredRestaurantByLimit));
+	}
 }

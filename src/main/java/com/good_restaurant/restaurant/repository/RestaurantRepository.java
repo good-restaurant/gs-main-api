@@ -14,7 +14,7 @@ import org.springframework.data.jpa.repository.Query;
 public interface RestaurantRepository extends JpaRepository<Restaurant, Long>, RestaurantQueryDslRepository {
 	
 	@Override
-	@EntityGraph(attributePaths = "detail")
+	@EntityGraph(attributePaths = {"restaurantMenus", "restaurantPictures"})
 	List<Restaurant> findAll();
 	
 	@Query("""

@@ -19,4 +19,6 @@ public interface RestaurantServiceV3 extends BaseCRUD<Restaurant, Long> {
 	List<Restaurant> getEmdRestaurants(String emd);
 	
 	List<Restaurant> limitFilter(Integer limit, List<Restaurant> restaurants);
+	
+	
 }
