@@ -1,8 +1,10 @@
 package com.good_restaurant.restaurant.service;
 
 import com.good_restaurant.restaurant.dto.RestaurantCoordinateResDto;
-import com.good_restaurant.restaurant.dto.RestaurantCreateReqDto;
 import com.good_restaurant.restaurant.dto.RestaurantDetailResDto;
+import com.good_restaurant.restaurant.dto.RestaurantDto;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 
 /**
@@ -51,7 +53,7 @@ public interface RestaurantService {
      *
      * @param dto 음식점 생성 요청 DTO
      */
-    void createRestaurantData(RestaurantCreateReqDto dto);
+    void createRestaurantData(RestaurantDto dto);
 	
 	/**
 	 * QueryDSL 기반으로 도로명 주소 중심 주변 음식점 상세 조회
@@ -70,4 +72,5 @@ public interface RestaurantService {
 	 * (기존 JPQL pickRandom 대체)
 	 */
 	List<RestaurantCoordinateResDto> getEntireRestaurantCoordinatesApplication(int limit);
+	
 }
