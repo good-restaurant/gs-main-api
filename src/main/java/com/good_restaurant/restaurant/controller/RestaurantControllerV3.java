@@ -1,12 +1,18 @@
 package com.good_restaurant.restaurant.controller;
 
+import com.good_restaurant.restaurant.domain.Restaurant;
 import com.good_restaurant.restaurant.dto.RestaurantCoordinateResDto;
 import com.good_restaurant.restaurant.dto.RestaurantDetailResDto;
 import com.good_restaurant.restaurant.dto.RestaurantDto;
-import com.good_restaurant.restaurant.service.RestaurantService;
+import com.good_restaurant.restaurant.dto.RestaurantFullDto;
+import com.good_restaurant.restaurant.mapper.RestaurantMapper;
+import com.good_restaurant.restaurant.service.A_Exception.MergePropertyException;
+import com.good_restaurant.restaurant.service.RestaurantServiceV3;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -14,7 +20,8 @@ import java.util.List;
 @RequestMapping("/v3/restaurant")
 public class RestaurantControllerV3 {
 
-	private final RestaurantService restaurantService;
+	private final RestaurantServiceV3 serviceV3;
+	private final RestaurantMapper mapper;
 
 	/**
 	 * 전체 음식점 좌표를 랜덤으로 조회합니다.
@@ -22,10 +29,11 @@ public class RestaurantControllerV3 {
 	 * @return 음식점 좌표 리스트
 	 */
 	@GetMapping("/all")
-	public List<RestaurantCoordinateResDto> getEntireRestaurantCoordinates(
-			@RequestParam(defaultValue = "100") int limit) {
-		List<RestaurantCoordinateResDto> data = restaurantService.getEntireRestaurantCoordinatesApplication(limit);
-		return data;
+	public ResponseEntity<List<RestaurantCoordinateResDto>> getEntireRestaurantCoordinates(
+			@RequestParam(defaultValue = "100") Integer limit) {
+		List<Restaurant> restaurantList = serviceV3.randomLimit(limit);
+		
+		return ResponseEntity.ok(mapper.toDto3(restaurantList));
 	}
 
 	/**
@@ -36,11 +44,12 @@ public class RestaurantControllerV3 {
 	 * @return 주변 음식점 리스트
 	 */
 	@GetMapping("/nearby")
-	public List<RestaurantDetailResDto> getNearbyRestaurants(
+	public ResponseEntity<List<RestaurantDetailResDto>> getNearbyRestaurants(
 			@RequestParam String address,
-			@RequestParam(defaultValue = "0.1") double radius,
-			@RequestParam(defaultValue = "20") int limit) {
-		return restaurantService.getNearbyRestaurantsQueryDsl(address, radius, limit);
+			@RequestParam(defaultValue = "0.1") Double radius,
+			@RequestParam(defaultValue = "20") Integer limit) {
+		List<Restaurant> restaurantList = serviceV3.getnearRestaurants(address, radius, limit);
+		return ResponseEntity.ok(mapper.toDto2(restaurantList));
 	}
 
 	/**
@@ -49,10 +58,13 @@ public class RestaurantControllerV3 {
 	 * @return 주변 음식점 리스트
 	 */
 	@GetMapping("/emd")
-	public List<RestaurantDetailResDto> findRestaurantsByEmd(
+	public ResponseEntity<List<RestaurantDetailResDto>> findRestaurantsByEmd(
 			@RequestParam String emd,
-			@RequestParam(defaultValue = "20") int limit) {
-		return restaurantService.findRestaurantsByEmdQueryDsl(emd, limit);
+			@RequestParam(defaultValue = "20") Integer limit) {
+		List<Restaurant> restaurantList = serviceV3.getEmdRestaurants(emd);
+		List<Restaurant> filteredRestaurantByLimit = serviceV3.limitFilter(limit, restaurantList);
+		
+		return ResponseEntity.ok(mapper.toDto2(filteredRestaurantByLimit));
 	}
 
 	/**
@@ -60,8 +72,11 @@ public class RestaurantControllerV3 {
 	 * @param dto 음식점 생성 요청 DTO
 	 */
 	@PostMapping("/create")
-	public void createRestaurantData(@RequestBody RestaurantDto dto) {
-		restaurantService.createRestaurantData(dto);
+	public ResponseEntity<RestaurantDto> createRestaurantData(@RequestBody RestaurantDto dto) {
+		RestaurantDto createdRestaurant = mapper.toDto(serviceV3.save(mapper.toEntity(dto)));
+		URI location = URI.create("/view/" + createdRestaurant.id());
+		
+		return ResponseEntity.created(location).body(createdRestaurant);
 	}
 
 	/**
@@ -69,8 +84,10 @@ public class RestaurantControllerV3 {
 	 * @param dto 음식점 수정 요청 DTO
 	 */
 	@PatchMapping("/update")
-	public void updateRestaurantData(@RequestBody RestaurantDto dto) {
-		// TODO: Implementation and decide request/response DTOs
+	public ResponseEntity<RestaurantDto> updateRestaurantData(@RequestBody RestaurantDto dto) throws MergePropertyException {
+		Restaurant entity = mapper.toEntity(dto);
+		RestaurantDto updateRestaurant = mapper.toDto(serviceV3.update(entity, dto.id()));
+		return ResponseEntity.accepted().body(updateRestaurant);
 	}
 
 	/**
@@ -78,7 +95,22 @@ public class RestaurantControllerV3 {
 	 * @param restaurantId 삭제할 음식점 ID
 	 */
 	@DeleteMapping("/delete")
-	public void deleteRetaurantData(@RequestParam Long restaurantId) {
-		// TODO: Implementation and decide request/response DTOs
+	public ResponseEntity<RestaurantDto> deleteRetaurantData(@RequestParam Long restaurantId) {
+		RestaurantDto deletedRestaurant = mapper.toDto(serviceV3.delete(restaurantId));
+		return ResponseEntity.ok(deletedRestaurant);
 	}
+	
+	/**
+	 * ID 기반으로 대상 음식점의 상세 정보를 조회합니다.
+	 *
+	 * @param id 대상 가게 ID
+	 * @return 주변 음식점 리스트
+	 */
+	@GetMapping("/view/{id}")
+	public ResponseEntity<RestaurantFullDto> findRestaurantsById(
+			@RequestParam(defaultValue = "20") Long id) {
+		Restaurant restaurant = serviceV3.getById(id);
+		return ResponseEntity.ok(mapper.toDto4(restaurant));
+	}
+	
 }
