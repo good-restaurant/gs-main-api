@@ -1,18 +1,17 @@
 package com.good_restaurant.restaurant.dto;
 
-import com.good_restaurant.restaurant.domain.Category;
+import com.good_restaurant.restaurant.domain.Restaurant;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Builder;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 /**
- * DTO for {@link com.good_restaurant.restaurant.domain.Restaurant}
+ * DTO for {@link Restaurant}
  */
-public record RestaurantDetailResDto(
+public record RestaurantDto(
 		Long id,
 		@NotNull @Size(max = 100) String restaurantName,
 		@Size(max = 255) String address,

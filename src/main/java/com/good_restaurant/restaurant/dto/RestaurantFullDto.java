@@ -1,18 +1,20 @@
 package com.good_restaurant.restaurant.dto;
 
-import com.good_restaurant.restaurant.domain.Category;
+import com.good_restaurant.restaurant.domain.Restaurant;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Builder;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Set;
 
 /**
- * DTO for {@link com.good_restaurant.restaurant.domain.Restaurant}
+ * 연관 항목까지 조회하거나 하는 항목
+ *
+ * DTO for {@link Restaurant}
  */
-public record RestaurantDetailResDto(
+public record RestaurantFullDto(
 		Long id,
 		@NotNull @Size(max = 100) String restaurantName,
 		@Size(max = 255) String address,
@@ -25,6 +27,9 @@ public record RestaurantDetailResDto(
 		@Size(max = 20) String phoneNumber,
 		LocalDate registeredDate,
 		LocalDate canceledDate,
-		BigDecimal rating
+		BigDecimal rating,
+		Set<RestaurantCommentDto> restaurantComments,
+		Set<RestaurantMenuDto> restaurantMenus,
+		Set<RestaurantPictureDto> restaurantPictures
 ) implements Serializable {
 }

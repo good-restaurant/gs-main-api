@@ -1,11 +1,11 @@
 package com.good_restaurant.restaurant.service.impl;
 
-import com.good_restaurant.restaurant.domain.RestaurantDetail;
+import com.good_restaurant.restaurant.domain.Restaurant;
 import com.good_restaurant.restaurant.dto.GeocodeResultDto;
 import com.good_restaurant.restaurant.dto.RestaurantCoordinateResDto;
-import com.good_restaurant.restaurant.dto.RestaurantCreateReqDto;
 import com.good_restaurant.restaurant.dto.RestaurantDetailResDto;
-import com.good_restaurant.restaurant.repository.RestaurantDetailRepository;
+import com.good_restaurant.restaurant.dto.RestaurantDto;
+import com.good_restaurant.restaurant.mapper.RestaurantMapper;
 import com.good_restaurant.restaurant.repository.RestaurantRepository;
 import com.good_restaurant.restaurant.service.GeocodingService;
 import com.good_restaurant.restaurant.service.RestaurantService;
@@ -36,9 +36,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class RestaurantServiceImpl implements RestaurantService {
 
     private final RestaurantRepository restaurantRepository;
-    private final RestaurantDetailRepository restaurantDetailRepository;
+//    private final RestaurantDetailRepository restaurantDetailRepository;
     private final GeocodingService geocodingService;
-    private final com.good_restaurant.restaurant.mapper.RestaurantMapper restaurantMapper;
+    private final RestaurantMapper restaurantMapper;
 	
 	/**
      * 전체 음식점 좌표를 랜덤으로 조회합니다.
@@ -50,18 +50,7 @@ public class RestaurantServiceImpl implements RestaurantService {
     public List<RestaurantCoordinateResDto> getEntireRestaurantCoordinates(int limit) {
         Pageable limitPage = PageRequest.of(0, limit);
 
-        return restaurantRepository.pickRandom(limitPage)
-            .stream()
-            .map(restaurant -> RestaurantCoordinateResDto.builder()
-                .id(restaurant.getId())
-                .restaurantName(restaurant.getRestaurantName())
-                .address(restaurant.getAddress())
-                .category(restaurant.getCategory())
-                .lon(restaurant.getLon())
-                .lat(restaurant.getLat())
-                .build()
-            )
-            .collect(Collectors.toList());
+        return restaurantMapper.toDto3(restaurantRepository.pickRandom(limitPage));
     }
 
     /**
@@ -129,7 +118,7 @@ public class RestaurantServiceImpl implements RestaurantService {
 				                                      .toList();
 		
 		// 4 DTO 매핑
-		return restaurantMapper.toCoordinateDtoList(limitedRestaurants);
+		return restaurantMapper.toDto(limitedRestaurants);
 	}
 	
 	
@@ -147,7 +136,7 @@ public class RestaurantServiceImpl implements RestaurantService {
      BigDecimal maxLon = geoResult.getLon().add(BigDecimal.valueOf(radius));
      Pageable limitPage = PageRequest.of(0, limit);
         
-     return restaurantMapper.toDetailDtoList(
+     return restaurantMapper.toDto2(
              restaurantRepository.findNearbyRestaurantsWithDetail(
                  minLat, maxLat, minLon, maxLon,
                  geoResult.getLat(), geoResult.getLon(),
@@ -162,7 +151,7 @@ public class RestaurantServiceImpl implements RestaurantService {
   */
  public List<RestaurantDetailResDto> findRestaurantsByEmdQueryDsl(String emd, int limit) {
      Pageable limitPage = PageRequest.of(0, limit);
-     return restaurantMapper.toDetailDtoList(restaurantRepository.findRestaurantsByEmdRandom(emd, limitPage));
+     return restaurantMapper.toDto2(restaurantRepository.findRestaurantsByEmdRandom(emd, limitPage));
  }
 	
 	/**
@@ -170,23 +159,10 @@ public class RestaurantServiceImpl implements RestaurantService {
 	 *
 	 * @param dto 음식점 생성 요청 DTO
 	 */
-	@Override
 	@Transactional
-	public void createRestaurantData(RestaurantCreateReqDto dto) {
-		Restaurant newRestaurant = restaurantRepository.save(Restaurant.builder()
-				                                                     .restaurantName(dto.getRestaurantName())
-				                                                     .address(dto.getAddress())
-				                                                     .category(dto.getCategory())
-				                                                     .lon(dto.getLon())
-				                                                     .lat(dto.getLat())
-				                                                     .build()
-		);
-		
-		restaurantDetailRepository.save(RestaurantDetail.builder()
-				                                .restaurant(newRestaurant)
-				                                .menu(dto.getMenu())
-				                                .phoneNumber(dto.getPhoneNumber())
-				                                .build()
+	@Override
+	public void createRestaurantData(RestaurantDto dto) {
+		Restaurant newRestaurant = restaurantRepository.save(restaurantMapper.toEntity(dto)
 		);
 	}
 }
