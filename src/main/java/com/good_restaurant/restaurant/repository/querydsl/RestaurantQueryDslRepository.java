@@ -21,4 +21,6 @@ public interface RestaurantQueryDslRepository {
 	);
 	
 	List<Restaurant> findRandomRestaurantsQueryDsl(Pageable limitPage);
+	
+	List<Restaurant> getRandomLimit(int limit);
 }

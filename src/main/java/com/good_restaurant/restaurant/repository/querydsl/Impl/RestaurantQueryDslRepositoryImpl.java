@@ -20,7 +20,7 @@ public class RestaurantQueryDslRepositoryImpl implements RestaurantQueryDslRepos
 	
 	private final JPAQueryFactory queryFactory;
 	
-	private final QRestaurant r = QRestaurant.restaurant;
+	private final QRestaurant qRestaurant = QRestaurant.restaurant;
 //	private final QRestaurantDetail d = QRestaurantDetail.restaurantDetail;
 	
 	/**
@@ -32,11 +32,22 @@ public class RestaurantQueryDslRepositoryImpl implements RestaurantQueryDslRepos
 	@Override
 	public List<Restaurant> findRandomRestaurantsQueryDsl(Pageable pageable) {
 		return queryFactory
-				       .selectFrom(r)
-				       .where(r.lat.isNotNull().and(r.lon.isNotNull()))
+				       .selectFrom(qRestaurant)
+				       .where(qRestaurant.lat.isNotNull().and(qRestaurant.lon.isNotNull()))
 				       .orderBy(Expressions.numberTemplate(Double.class, "random()").asc()) // PostgreSQL 내장함수
 				       .offset(pageable.getOffset())
 				       .limit(pageable.getPageSize())
+				       .fetch();
+	}
+	
+	@Override
+	public List<Restaurant> getRandomLimit(int limit) {
+		return queryFactory
+				       .selectFrom(qRestaurant)
+				       .where(qRestaurant.lat.isNotNull()
+						              .and(qRestaurant.lon.isNotNull()))
+				       .orderBy(Expressions.numberTemplate(Double.class, "random()").asc())
+				       .limit(limit)
 				       .fetch();
 	}
 	
@@ -53,14 +64,14 @@ public class RestaurantQueryDslRepositoryImpl implements RestaurantQueryDslRepos
 			Pageable pageable
 	) {
 		return queryFactory
-				       .selectFrom(r)
-				       .where(r.lat.between(minLat, maxLat)
-						              .and(r.lon.between(minLon, maxLon)))
+				       .selectFrom(qRestaurant)
+				       .where(qRestaurant.lat.between(minLat, maxLat)
+						              .and(qRestaurant.lon.between(minLon, maxLon)))
 				       .orderBy(
-						       r.id.asc(), // DISTINCT ON 에 포함될 키
+						       qRestaurant.id.asc(), // DISTINCT ON 에 포함될 키
 						       Expressions.numberTemplate(Double.class,
 								       "(power({0} - {1}, 2) + power({2} - {3}, 2))",
-								       r.lat, centerLat, r.lon, centerLon).asc()
+								       qRestaurant.lat, centerLat, qRestaurant.lon, centerLon).asc()
 				       )
 				       .fetch();
 	}
@@ -74,10 +85,10 @@ public class RestaurantQueryDslRepositoryImpl implements RestaurantQueryDslRepos
 	public List<Restaurant> findRestaurantsByEmdRandom(String emd, Pageable pageable) {
 		
 		// (Optional) count 기반 랜덤 offset 최적화
-		Long totalCount = queryFactory.select(r.count()).from(r)
-				                  .where(r.emdKorNm.eq(emd)
-						                         .and(r.lat.isNotNull())
-						                         .and(r.lon.isNotNull()))
+		Long totalCount = queryFactory.select(qRestaurant.count()).from(qRestaurant)
+				                  .where(qRestaurant.emdKorNm.eq(emd)
+						                         .and(qRestaurant.lat.isNotNull())
+						                         .and(qRestaurant.lon.isNotNull()))
 				                  .fetchOne();
 		
 		long offset = 0L;
@@ -86,10 +97,10 @@ public class RestaurantQueryDslRepositoryImpl implements RestaurantQueryDslRepos
 		}
 		
 		return queryFactory
-				       .selectFrom(r).distinct()
-				       .where(r.emdKorNm.eq(emd)
-						              .and(r.lat.isNotNull())
-						              .and(r.lon.isNotNull()))
+				       .selectFrom(qRestaurant).distinct()
+				       .where(qRestaurant.emdKorNm.eq(emd)
+						              .and(qRestaurant.lat.isNotNull())
+						              .and(qRestaurant.lon.isNotNull()))
 				       .offset(offset)
 				       .limit(pageable.getPageSize())
 				       .fetch();

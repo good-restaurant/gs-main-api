@@ -74,4 +74,7 @@ public interface RestaurantRepository extends JpaRepository<Restaurant, Long>, R
 	  order by function('random')
 	""")
 	List<RestaurantDetailResDto> findRestaurantsByEmd(String emd, Pageable pageable);
+	
+	// 행정동기준 조회, 문자열 일치해야함
+	List<Restaurant> findByEmdKorNm(String emd);
 }
