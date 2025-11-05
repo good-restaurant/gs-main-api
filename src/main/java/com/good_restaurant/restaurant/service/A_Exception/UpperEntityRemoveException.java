@@ -1,6 +1,6 @@
 package com.good_restaurant.restaurant.service.A_Exception;
 
-import com.gsmart_mes_api.Service.A_Exception.statusEnum.ServiceRuleViolationReason;
+import com.good_restaurant.restaurant.service.A_Exception.statusEnum.ServiceRuleViolationReason;
 
 public class UpperEntityRemoveException extends ServiceRuleViolationException {
 
