@@ -9,5 +9,8 @@ import java.io.Serializable;
 /**
  * DTO for {@link Restaurant}
  */
-public record RestaurantIdDto(Long id, @NotNull @Size(max = 100) String restaurantName) implements Serializable {
+public record RestaurantIdDto(
+		Long id,
+		@NotNull @Size(max = 100) String restaurantName
+) implements Serializable {
 }

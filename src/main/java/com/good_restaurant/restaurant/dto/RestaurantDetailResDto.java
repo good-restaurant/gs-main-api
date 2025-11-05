@@ -1,29 +1,30 @@
 package com.good_restaurant.restaurant.dto;
 
 import com.good_restaurant.restaurant.domain.Category;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import lombok.Builder;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import java.time.LocalDate;
 
-@Getter
-@AllArgsConstructor
-@Builder
-public class RestaurantDetailResDto {
-
-	// restaurant info
-	private final Long id;
-
-	private final String restaurantName;
-	private final String address;
-	private final Category category;
-
-	private final BigDecimal lon;
-	private final BigDecimal lat;
-
-	// restaurant_detail info
-	private final String menu;
-	private final String phoneNumber;
+/**
+ * DTO for {@link com.good_restaurant.restaurant.domain.Restaurant}
+ */
+public record RestaurantDetailResDto(
+		Long id,
+		@NotNull @Size(max = 100) String restaurantName,
+		@Size(max = 255) String address,
+		@Size(max = 255) String category,
+		BigDecimal lon,
+		BigDecimal lat,
+		@Size(max = 50) String ctpKorNm,
+		@Size(max = 50) String sigKorNm,
+		@Size(max = 50) String emdKorNm,
+		@Size(max = 20) String phoneNumber,
+		LocalDate registeredDate,
+		LocalDate canceledDate,
+		BigDecimal rating
+) implements Serializable {
 }
