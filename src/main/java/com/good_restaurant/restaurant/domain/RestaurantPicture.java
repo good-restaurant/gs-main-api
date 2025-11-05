@@ -2,13 +2,14 @@ package com.good_restaurant.restaurant.domain;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.UUID;
 
 @Getter
-@Setter
+@Builder(toBuilder = true)
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "restaurant_picture", schema = "good_restaurant")
 public class RestaurantPicture {
