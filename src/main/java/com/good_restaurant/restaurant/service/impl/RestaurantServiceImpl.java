@@ -1,6 +1,5 @@
 package com.good_restaurant.restaurant.service.impl;
 
-import com.good_restaurant.restaurant.domain.Restaurant;
 import com.good_restaurant.restaurant.domain.RestaurantDetail;
 import com.good_restaurant.restaurant.dto.GeocodeResultDto;
 import com.good_restaurant.restaurant.dto.RestaurantCoordinateResDto;

@@ -1,6 +1,5 @@
 package com.good_restaurant.restaurant.repository;
 
-import com.good_restaurant.restaurant.domain.Restaurant;
 import com.good_restaurant.restaurant.dto.RestaurantDetailResDto;
 import java.math.BigDecimal;
 import java.util.List;
