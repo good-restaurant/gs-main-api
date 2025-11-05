@@ -1,10 +1,6 @@
 package com.good_restaurant.restaurant.controller;
 
-import com.good_restaurant.restaurant.dto.DataListResDto;
-import com.good_restaurant.restaurant.dto.RestaurantCoordinateResDto;
-import com.good_restaurant.restaurant.dto.RestaurantCreateReqDto;
-import com.good_restaurant.restaurant.dto.RestaurantDetailResDto;
-import com.good_restaurant.restaurant.dto.RestaurantUpdateReqDto;
+import com.good_restaurant.restaurant.dto.*;
 import com.good_restaurant.restaurant.service.RestaurantService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -72,7 +68,7 @@ public class RestaurantController {
 	 * @param dto 음식점 생성 요청 DTO
 	 */
 	@PostMapping("/create")
-	public void createRestaurantData(@RequestBody RestaurantCreateReqDto dto) {
+	public void createRestaurantData(@RequestBody RestaurantDto dto) {
 		restaurantService.createRestaurantData(dto);
 	}
 
@@ -81,7 +77,7 @@ public class RestaurantController {
 	 * @param dto 음식점 수정 요청 DTO
 	 */
 	@PatchMapping("/update")
-	public void updateRestaurantData(@RequestBody RestaurantUpdateReqDto dto) {
+	public void updateRestaurantData(@RequestBody RestaurantDto dto) {
 		// TODO: Implementation and decide request/response DTOs
 	}
 

@@ -58,7 +58,7 @@ public class RestaurantControllerV2 {
 	 * @param dto 음식점 생성 요청 DTO
 	 */
 	@PostMapping("/create")
-	public void createRestaurantData(@RequestBody RestaurantCreateReqDto dto) {
+	public void createRestaurantData(@RequestBody RestaurantDto dto) {
 		restaurantService.createRestaurantData(dto);
 	}
 
@@ -67,7 +67,7 @@ public class RestaurantControllerV2 {
 	 * @param dto 음식점 수정 요청 DTO
 	 */
 	@PatchMapping("/update")
-	public void updateRestaurantData(@RequestBody RestaurantUpdateReqDto dto) {
+	public void updateRestaurantData(@RequestBody RestaurantDto dto) {
 		// TODO: Implementation and decide request/response DTOs
 	}
 
