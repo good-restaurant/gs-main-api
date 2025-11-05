@@ -1,9 +1,10 @@
 package com.good_restaurant.restaurant.repository;
 
-import com.good_restaurant.restaurant.dto.RestaurantDetailResDto;
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.good_restaurant.restaurant.domain.Restaurant;
+import com.good_restaurant.restaurant.dto.RestaurantDetailResDto;
 import com.good_restaurant.restaurant.repository.querydsl.RestaurantQueryDslRepository;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -26,11 +27,21 @@ public interface RestaurantRepository extends JpaRepository<Restaurant, Long>, R
 
 	@Query("""
 	  select new com.good_restaurant.restaurant.dto.RestaurantDetailResDto(
-	    r.id, r.restaurantName, r.address, r.category, r.lon, r.lat,
-	    d.menu, d.phoneNumber
-	  )
+		  r.id,
+          r.restaurantName,
+          r.address,
+          r.category,
+          r.lon,
+          r.lat,
+          r.ctpKorNm,
+          r.sigKorNm,
+          r.emdKorNm,
+          r.phoneNumber,
+          r.registeredDate,
+          r.canceledDate,
+          r.rating
+		  )
 	  from Restaurant r
-	  left join r.detail d
 	  where r.lat between :minLat and :maxLat
 	    and r.lon between :minLon and :maxLon
 	  order by (power(r.lat - :centerLat, 2) + power(r.lon - :centerLon, 2)) asc
@@ -44,11 +55,21 @@ public interface RestaurantRepository extends JpaRepository<Restaurant, Long>, R
 
 	@Query("""
 	  select new com.good_restaurant.restaurant.dto.RestaurantDetailResDto(
-	    r.id, r.restaurantName, r.address, r.category, r.lon, r.lat,
-	    d.menu, d.phoneNumber
+          r.id,
+          r.restaurantName,
+          r.address,
+          r.category,
+          r.lon,
+          r.lat,
+          r.ctpKorNm,
+          r.sigKorNm,
+          r.emdKorNm,
+          r.phoneNumber,
+          r.registeredDate,
+          r.canceledDate,
+          r.rating
 	  )
 	  from Restaurant r
-	  left join r.detail d
 	  where r.emdKorNm = :emd
 	  order by function('random')
 	""")
