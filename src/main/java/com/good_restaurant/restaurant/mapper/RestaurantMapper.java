@@ -53,8 +53,10 @@ public interface RestaurantMapper {
 	
 	List<RestaurantDetailResDto> toDto2(List<Restaurant> nearbyRestaurantsWithDetail);
 	
+	@Mapping(source = "restaurantPictures", target = "restaurantPictures")
 	Restaurant toEntity(RestaurantFullDto restaurantFullDto);
 	
+	@Mapping(source = "restaurantPictures", target = "restaurantPictures")
 	RestaurantFullDto toDto4(Restaurant restaurant);
 	
 	List<RestaurantFullDto> toDto4(List<Restaurant> restaurant);
@@ -78,12 +80,13 @@ public interface RestaurantMapper {
 	default void linkRestaurantPictures(@MappingTarget Restaurant restaurant) {
 		Set<RestaurantPicture> cur = restaurant.getRestaurantPictures();
 		if (cur == null || cur.isEmpty()) return;
-		Restaurant parent = restaurant;
+		
 		Set<RestaurantPicture> rebuilt = cur.stream()
-				                              .map(m -> m.toBuilder().restaurant(parent).build())
-				                              .collect(Collectors.toCollection(LinkedHashSet::new));
-		cur.clear();
-		cur.addAll(rebuilt);
+				                                 .map(pic -> RestaurantPicture.withParent(pic, restaurant))
+				                                 .collect(Collectors.toCollection(LinkedHashSet::new));
+		
+		restaurant.getRestaurantPictures().clear();
+		restaurant.getRestaurantPictures().addAll(rebuilt);
 	}
 	
 	@AfterMapping

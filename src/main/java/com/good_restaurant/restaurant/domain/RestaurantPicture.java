@@ -9,7 +9,7 @@ import java.util.UUID;
 @Getter
 @Builder(toBuilder = true)
 @AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED) // JPA용
 @Entity
 @Table(name = "restaurant_picture", schema = "good_restaurant")
 public class RestaurantPicture {
@@ -35,5 +35,16 @@ public class RestaurantPicture {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "restaurant_id")
 	private Restaurant restaurant;
+	
+	// ✅ 정적 팩토리 메서드 추가
+	public static RestaurantPicture withParent(RestaurantPicture origin, Restaurant restaurant) {
+		return RestaurantPicture.builder()
+				       .id(origin.id)
+				       .pictureUuid(origin.pictureUuid)
+				       .originalFilename(origin.originalFilename)
+				       .s3ObjectKey(origin.s3ObjectKey)
+				       .restaurant(restaurant)
+				       .build();
+	}
 	
 }
