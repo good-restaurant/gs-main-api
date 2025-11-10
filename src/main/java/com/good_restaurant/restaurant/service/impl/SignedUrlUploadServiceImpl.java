@@ -75,7 +75,7 @@ public class SignedUrlUploadServiceImpl implements SignedUrlUploadService {
 			RestaurantPicture picture = RestaurantPicture.builder()
 					                            .pictureUuid(UUID.fromString(objectKey.split("_")[0]))
 					                            .originalFilename(file.getOriginalFilename())
-					                            .s3ObjectKey(objectKey)
+					                            .s3ObjectKey(URLEncoder.encode(objectKey))
 					                            .restaurant(restaurant)
 					                            .build();
 			
