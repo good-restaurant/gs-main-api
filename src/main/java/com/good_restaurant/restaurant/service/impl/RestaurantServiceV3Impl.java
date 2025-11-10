@@ -109,4 +109,37 @@ public class RestaurantServiceV3Impl implements RestaurantServiceV3, BaseCRUD<Re
 		// 앞에서부터 limit 개만 반환
 		return shuffled.subList(0, limit);
 	}
+	
+	@Override
+	public List<Restaurant> getLocatedRestaurants(Double lat, Double lon, Double radius, Integer limit) {
+		
+		// ## 반경(m) → 위경도 차이(degree)
+		double deltaLat = meterToLatitudeDegree(radius);
+		double deltaLon = meterToLongitudeDegree(radius, lat);
+		
+		// ## 검색 영역 (Bounding Box)
+		double minLat = lat - deltaLat;
+		double maxLat = lat + deltaLat;
+		double minLon = lon - deltaLon;
+		double maxLon = lon + deltaLon;
+		
+		// ## 쿼리 실행 (QueryDSL or JPQL 가능)
+		return repository.findByLatBetweenAndLonBetween(
+				minLat, maxLat, minLon, maxLon,
+				PageRequest.of(0, limit)
+		);
+		
+	}
+	
+	
+	// ## 위도 변환 (1도 ≈ 111.32km)
+	private double meterToLatitudeDegree(double meters) {
+		return meters / 111_320.0;
+	}
+	
+	// ## 경도 변환 (위도 따라 다름)
+	private double meterToLongitudeDegree(double meters, double latitude) {
+		double latRad = Math.toRadians(latitude);
+		return meters / (111_320.0 * Math.cos(latRad));
+	}
 }

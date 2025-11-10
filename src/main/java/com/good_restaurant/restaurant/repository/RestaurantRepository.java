@@ -6,6 +6,7 @@ import java.util.List;
 import com.good_restaurant.restaurant.domain.Restaurant;
 import com.good_restaurant.restaurant.dto.RestaurantDetailResDto;
 import com.good_restaurant.restaurant.repository.querydsl.RestaurantQueryDslRepository;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -77,4 +78,6 @@ public interface RestaurantRepository extends JpaRepository<Restaurant, Long>, R
 	
 	// 행정동기준 조회, 문자열 일치해야함
 	List<Restaurant> findByEmdKorNm(String emd);
+	
+	List<Restaurant> findByLatBetweenAndLonBetween(double minLat, double maxLat, double minLon, double maxLon, PageRequest of);
 }
