@@ -55,7 +55,8 @@ public class RestaurantControllerV3 {
 	/**
 	 * 위치좌표를 기반으로 주변 음식점 목록을 조회합니다.
 	 *
-	 * @param location 좌표정보 (126.9779692, 37.566535)
+	 * @param lat 좌표정보 위도 (37.566535)
+	 * @param lon 좌표정보 경도 (126.9779692) - 서울시청 좌표임
 	 * @param radius  검색 반경(미터 단위로 처리)
 	 * @param limit   조회할 음식점 개수(기본값: 20)
 	 * @return 주변 음식점 리스트
