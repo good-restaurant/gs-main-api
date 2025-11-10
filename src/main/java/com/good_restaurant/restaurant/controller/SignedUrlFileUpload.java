@@ -12,6 +12,8 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,10 +33,12 @@ public class SignedUrlFileUpload {
 			@PathVariable Long restaurantId,
 			@RequestParam("file") MultipartFile file) {
 		
-		// 여기서는 예시용 Mock 객체
+		// 레스토랑 정보를 가져다 쓸 수 있도록 entity 형태로 입력
 		Restaurant restaurant = Restaurant.builder().id(restaurantId).build();
 		
+		// 인코딩된 파일명으로 업로드 처리
 		RestaurantPicture savedPicture = signedUrlUploadService.uploadPicture(restaurant, file);
+		
 		
 		return ResponseEntity.ok(savedPicture);
 	}
