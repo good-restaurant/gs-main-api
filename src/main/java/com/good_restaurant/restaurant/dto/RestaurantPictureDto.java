@@ -12,6 +12,8 @@ import java.util.UUID;
 public record RestaurantPictureDto(
 		Long id,
 		@NotNull UUID pictureUuid,
-		Long restaurantId
+		Long restaurantId,
+		String originalFilename,
+		String s3ObjectKey
 ) implements Serializable {
 }

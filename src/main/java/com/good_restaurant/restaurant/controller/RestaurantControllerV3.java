@@ -108,7 +108,7 @@ public class RestaurantControllerV3 {
 	 */
 	@GetMapping("/view/{id}")
 	public ResponseEntity<RestaurantFullDto> findRestaurantsById(
-			@RequestParam(defaultValue = "1342") Long id) {
+			@PathVariable("id") Long id) {
 		Restaurant restaurant = serviceV3.getById(id);
 		return ResponseEntity.ok(mapper.toDto4(restaurant));
 	}

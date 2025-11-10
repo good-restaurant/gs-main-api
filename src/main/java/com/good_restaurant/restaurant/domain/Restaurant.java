@@ -74,7 +74,7 @@ public class Restaurant {
 	@OneToMany(mappedBy = "restaurant")
 	private Set<RestaurantMenu> restaurantMenus = new LinkedHashSet<>();
 	
-	@OneToMany(mappedBy = "restaurant")
+	@OneToMany(mappedBy = "restaurant", fetch = FetchType.EAGER)
 	private Set<RestaurantPicture> restaurantPictures = new LinkedHashSet<>();
 	
 }
