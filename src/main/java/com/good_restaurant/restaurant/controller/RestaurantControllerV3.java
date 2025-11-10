@@ -51,6 +51,24 @@ public class RestaurantControllerV3 {
 		List<Restaurant> restaurantList = serviceV3.getnearRestaurants(address, radius, limit);
 		return ResponseEntity.ok(mapper.toDto2(restaurantList));
 	}
+	
+	/**
+	 * 위치좌표를 기반으로 주변 음식점 목록을 조회합니다.
+	 *
+	 * @param location 좌표정보 (126.9779692, 37.566535)
+	 * @param radius  검색 반경(미터 단위로 처리)
+	 * @param limit   조회할 음식점 개수(기본값: 20)
+	 * @return 주변 음식점 리스트
+	 */
+	@GetMapping("/location")
+	public ResponseEntity<List<RestaurantDetailResDto>> getNearbyRestaurantsByLocation(
+			@RequestParam Double lat,    // 위도
+			@RequestParam Double lon,    // 경도
+			@RequestParam(defaultValue = "250") Double radius,
+			@RequestParam(defaultValue = "20") Integer limit) {
+		List<Restaurant> restaurantList = serviceV3.getLocatedRestaurants(lat, lon, radius, limit);
+		return ResponseEntity.ok(mapper.toDto2(restaurantList));
+	}
 
 	/**
 	 * 행정동 기반으로 주변 음식점 목록을 조회합니다.
