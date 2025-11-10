@@ -21,4 +21,5 @@ public interface RestaurantServiceV3 extends BaseCRUD<Restaurant, Long> {
 	List<Restaurant> limitFilter(Integer limit, List<Restaurant> restaurants);
 	
 	
+	List<Restaurant> getLocatedRestaurants(Double lat, Double lon, Double radius, Integer limit);
 }
