@@ -70,15 +70,24 @@ public class RestaurantServiceV3Impl implements RestaurantServiceV3, BaseCRUD<Re
 		
 		GeocodeResultDto geocodeResultDto = geocodingService.geocode(address);
 		
-		BigDecimal minLat = geocodeResultDto.getLat().subtract(BigDecimal.valueOf(radius));
-		BigDecimal maxLat = geocodeResultDto.getLat().add(BigDecimal.valueOf(radius));
-		BigDecimal minLon = geocodeResultDto.getLon().subtract(BigDecimal.valueOf(radius));
-		BigDecimal maxLon = geocodeResultDto.getLon().add(BigDecimal.valueOf(radius));
+		// 도로명 주소로 확인한 기준좌표점
+		double lat = geocodeResultDto.getLat().doubleValue();
+		double lon = geocodeResultDto.getLon().doubleValue();
 		
-		return repository.findNearbyRestaurantsWithDetail(
+		// 반경(m) -> 위경도 차이(degree)로 처리
+		double deltaLat = meterToLatitudeDegree(1000 * radius);          // 거리(m) 입력
+		double deltaLon = meterToLongitudeDegree(1000 * radius, lat);    // 거리(m) + 위도 기준 입력
+		
+		
+		// 최종 검색 영역 (Bounding Box)
+		double minLat = lat - deltaLat;
+		double maxLat = lat + deltaLat;
+		double minLon = lon - deltaLon;
+		double maxLon = lon + deltaLon;
+		
+		
+		return repository.findByLatBetweenAndLonBetween(
 				minLat, maxLat, minLon, maxLon,
-				BigDecimal.valueOf(geocodeResultDto.getLat().doubleValue()),
-				BigDecimal.valueOf(geocodeResultDto.getLon().doubleValue()),
 				PageRequest.of(0, limit)
 		);
 	}
@@ -113,17 +122,17 @@ public class RestaurantServiceV3Impl implements RestaurantServiceV3, BaseCRUD<Re
 	@Override
 	public List<Restaurant> getLocatedRestaurants(Double lat, Double lon, Double radius, Integer limit) {
 		
-		// ## 반경(m) → 위경도 차이(degree)
+		// 반경(m) → 위경도 차이(degree)
 		double deltaLat = meterToLatitudeDegree(radius);
 		double deltaLon = meterToLongitudeDegree(radius, lat);
 		
-		// ## 검색 영역 (Bounding Box)
+		// 검색 영역 (Bounding Box)
 		double minLat = lat - deltaLat;
 		double maxLat = lat + deltaLat;
 		double minLon = lon - deltaLon;
 		double maxLon = lon + deltaLon;
 		
-		// ## 쿼리 실행 (QueryDSL or JPQL 가능)
+		// findByJPARepository
 		return repository.findByLatBetweenAndLonBetween(
 				minLat, maxLat, minLon, maxLon,
 				PageRequest.of(0, limit)
