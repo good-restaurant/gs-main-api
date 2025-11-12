@@ -14,6 +14,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -138,6 +139,11 @@ public class RestaurantServiceV3Impl implements RestaurantServiceV3, BaseCRUD<Re
 				PageRequest.of(0, limit)
 		);
 		
+	}
+	
+	@Override
+	public List<Restaurant> getEmdLikeRestaurants(String emd) {
+		return repository.findByEmdKorNmContainsOrEmdKorNmLike(emd, emd);
 	}
 	
 	
