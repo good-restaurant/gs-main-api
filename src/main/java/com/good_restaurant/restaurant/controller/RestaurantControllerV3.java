@@ -39,7 +39,7 @@ public class RestaurantControllerV3 {
 	/**
 	 * 도로명 주소를 기반으로 주변 음식점 목록을 조회합니다.
 	 * @param address 도로명 주소
-	 * @param radius 검색 반경(위/경도 단위, 기본값: 0.1)
+	 * @param radius 검색 반경(위/경도 단위, 기본값: 0.1) -> 0.1 = 100M 로 설정하여 처리
 	 * @param limit 조회할 음식점 개수(기본값: 20)
 	 * @return 주변 음식점 리스트
 	 */
