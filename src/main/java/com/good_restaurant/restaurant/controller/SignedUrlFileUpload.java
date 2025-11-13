@@ -23,7 +23,7 @@ import java.util.List;
 @RequestMapping("/v1/signed-upload")
 public class SignedUrlFileUpload {
 	
-//	entity와 관련없는 업로드 서비스가 필요할 때 사용
+	//	entity와 관련없는 업로드 서비스가 필요할 때 사용
 	private final SignedUrlUploadService signedUrlUploadService;
 	
 	private final RestaurantPictureService restaurantPictureService;
