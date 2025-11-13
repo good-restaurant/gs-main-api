@@ -2,6 +2,8 @@ package com.good_restaurant.restaurant.controller;
 
 
 import com.good_restaurant.restaurant.service.RestaurantMenuService;
+import com.good_restaurant.restaurant.service.SignedUrlDownloadService;
+import com.good_restaurant.restaurant.service.SignedUrlUploadService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
