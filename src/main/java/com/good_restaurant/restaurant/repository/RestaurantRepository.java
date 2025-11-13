@@ -80,4 +80,8 @@ public interface RestaurantRepository extends JpaRepository<Restaurant, Long>, R
 	List<Restaurant> findByEmdKorNm(String emd);
 	
 	List<Restaurant> findByLatBetweenAndLonBetween(double minLat, double maxLat, double minLon, double maxLon, PageRequest of);
+	
+	List<Restaurant> findByEmdKorNmLike(String emdKorNm);
+	
+	List<Restaurant> findByEmdKorNmContainsOrEmdKorNmLike(String emdKorNm, String emdKorNm1);
 }
