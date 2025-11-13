@@ -16,7 +16,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING, uses = {RestaurantCommentMapper.class, RestaurantMenuMapper.class, RestaurantPictureMapper.class})
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING, uses = {
+//		RestaurantCommentMapper.class,
+		RestaurantMenuMapper.class,
+		RestaurantPictureMapper.class
+})
 public interface RestaurantMapper {
 	
 	Restaurant toEntity(RestaurantDto restaurantDto);
@@ -89,15 +93,15 @@ public interface RestaurantMapper {
 		restaurant.getRestaurantPictures().addAll(rebuilt);
 	}
 	
-	@AfterMapping
-	default void linkRestaurantComments(@MappingTarget Restaurant restaurant) {
-		Set<RestaurantComment> cur = restaurant.getRestaurantComments();
-		if (cur == null || cur.isEmpty()) return;
-		Restaurant parent = restaurant;
-		Set<RestaurantComment> rebuilt = cur.stream()
-				                                 .map(m -> m.toBuilder().restaurant(parent).build())
-				                                 .collect(Collectors.toCollection(LinkedHashSet::new));
-		cur.clear();
-		cur.addAll(rebuilt);
-	}
+//	@AfterMapping
+//	default void linkRestaurantComments(@MappingTarget Restaurant restaurant) {
+//		Set<RestaurantComment> cur = restaurant.getRestaurantComments();
+//		if (cur == null || cur.isEmpty()) return;
+//		Restaurant parent = restaurant;
+//		Set<RestaurantComment> rebuilt = cur.stream()
+//				                                 .map(m -> m.toBuilder().restaurant(parent).build())
+//				                                 .collect(Collectors.toCollection(LinkedHashSet::new));
+//		cur.clear();
+//		cur.addAll(rebuilt);
+//	}
 }

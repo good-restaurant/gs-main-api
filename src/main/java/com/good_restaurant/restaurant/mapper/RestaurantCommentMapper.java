@@ -18,12 +18,16 @@ public interface RestaurantCommentMapper {
 	List<RestaurantCommentDto> toDto(List<RestaurantComment> restaurantComment);
 	
 	@BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+	@Mapping(target = "restaurant", ignore = true)
 	RestaurantComment partialUpdate(RestaurantCommentDto restaurantCommentDto, @MappingTarget RestaurantComment restaurantComment);
 	
+	@Mapping(target = "restaurant", source = "restaurant")
 	RestaurantComment toEntity(RestaurantCommentFullDto restaurantCommentFullDto);
 	
+	@Mapping(target = "restaurant", source = "restaurant")
 	RestaurantCommentFullDto toFullDto(RestaurantComment restaurantComment);
 	
 	@BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+	@Mapping(target = "restaurant", ignore = true)
 	RestaurantComment partialUpdate(RestaurantCommentFullDto restaurantCommentFullDto, @MappingTarget RestaurantComment restaurantComment);
 }
