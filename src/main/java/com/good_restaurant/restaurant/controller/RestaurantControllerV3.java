@@ -35,11 +35,27 @@ public class RestaurantControllerV3 {
 		
 		return ResponseEntity.ok(mapper.toDto3(restaurantList));
 	}
-
+	
+	/**
+	 * 전체 음식점 좌표를 랜덤으로 조회합니다.
+	 *
+	 * @param limit 조회할 음식점 좌표 개수(기본값: 100)
+	 * @return 음식점 좌표 리스트
+	 */
+	@GetMapping("/list-search")
+	public ResponseEntity<List<RestaurantCoordinateResDto>> getEntireRestaurantCoordinates(
+			@RequestParam String emd,
+			@RequestParam(defaultValue = "100") Integer limit) {
+		List<Restaurant> restaurantList = serviceV3.getEmdLikeRestaurants(emd);
+		List<Restaurant> filteredRestaurantByLimit = serviceV3.limitFilter(limit, restaurantList);
+		
+		return ResponseEntity.ok(mapper.toDto3(filteredRestaurantByLimit));
+	}
+	
 	/**
 	 * 도로명 주소를 기반으로 주변 음식점 목록을 조회합니다.
 	 * @param address 도로명 주소
-	 * @param radius 검색 반경(위/경도 단위, 기본값: 0.1)
+	 * @param radius 검색 반경(위/경도 단위, 기본값: 0.1) -> 0.1 = 100M 로 설정하여 처리
 	 * @param limit 조회할 음식점 개수(기본값: 20)
 	 * @return 주변 음식점 리스트
 	 */

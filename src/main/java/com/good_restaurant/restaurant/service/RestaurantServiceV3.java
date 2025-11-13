@@ -22,4 +22,6 @@ public interface RestaurantServiceV3 extends BaseCRUD<Restaurant, Long> {
 	
 	
 	List<Restaurant> getLocatedRestaurants(Double lat, Double lon, Double radius, Integer limit);
+	
+	List<Restaurant> getEmdLikeRestaurants(String emd);
 }
