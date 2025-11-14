@@ -7,6 +7,9 @@ import com.good_restaurant.restaurant.dto.RestaurantDetailResDto;
 import com.good_restaurant.restaurant.dto.RestaurantDto;
 import com.good_restaurant.restaurant.mapper.RestaurantMapper;
 import com.good_restaurant.restaurant.repository.RestaurantRepository;
+import com.good_restaurant.restaurant.service.A_Exception.MergePropertyException;
+import com.good_restaurant.restaurant.service.A_base.BaseCRUD;
+import com.good_restaurant.restaurant.service.A_base.ServiceHelper;
 import com.good_restaurant.restaurant.service.GeocodingService;
 import com.good_restaurant.restaurant.service.RestaurantService;
 import java.math.BigDecimal;
@@ -15,8 +18,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,12 +39,13 @@ import org.springframework.transaction.annotation.Transactional;
  * </ul>
  * 스프링 빈 등록은 {@link org.springframework.stereotype.Service} 애너테이션으로 처리됩니다.
  */
-public class RestaurantServiceImpl implements RestaurantService {
+public class RestaurantServiceImpl implements RestaurantService, BaseCRUD<Restaurant, Long> {
 
     private final RestaurantRepository restaurantRepository;
 //    private final RestaurantDetailRepository restaurantDetailRepository;
     private final GeocodingService geocodingService;
     private final RestaurantMapper restaurantMapper;
+	private final ServiceHelper<Restaurant, Long> serviceHelper;
 	
 	/**
      * 전체 음식점 좌표를 랜덤으로 조회합니다.
@@ -50,7 +57,7 @@ public class RestaurantServiceImpl implements RestaurantService {
     public List<RestaurantCoordinateResDto> getEntireRestaurantCoordinates(int limit) {
         Pageable limitPage = PageRequest.of(0, limit);
 
-        return restaurantMapper.toDto3(restaurantRepository.pickRandom(limitPage));
+        return restaurantMapper.toCoordinateDto(restaurantRepository.pickRandom(limitPage));
     }
 
     /**
@@ -118,7 +125,49 @@ public class RestaurantServiceImpl implements RestaurantService {
 				                                      .toList();
 		
 		// 4 DTO 매핑
-		return restaurantMapper.toDto(limitedRestaurants);
+		return restaurantMapper.toCoordinateDto(limitedRestaurants);
+	}
+	
+	@Override
+	public Page<Restaurant> getRestaurantsAsPage(Pageable pageable) {
+		Page<Restaurant> restaurantPage = restaurantRepository.findAll(pageable);
+		return restaurantPage;
+	}
+	
+	@Override
+	public Restaurant findRestaurantsById(Long id) {
+		return restaurantRepository.findById(id).orElse(null);
+	}
+	
+	@Override
+	public Restaurant save(Restaurant entity) {
+		return restaurantRepository.save(entity);
+	}
+	
+	@Override
+	public Restaurant updateRule(Restaurant source, Restaurant target) throws MergePropertyException {
+		return serviceHelper.updateRule(source, target);
+	}
+	
+	@Override
+	public JpaRepository<Restaurant, Long> getRepository() {
+		return this.restaurantRepository;
+	}
+	
+	@SneakyThrows
+	@Override
+	public Restaurant updateRestaurant(Long id, Restaurant entity) {
+		return update(entity, id);
+	}
+	
+	@Override
+	public Restaurant delete(Long id) {
+		return delete(id);
+	}
+	
+	@Override
+	public Long getEntityId(Restaurant entity) {
+		return entity.getId();
 	}
 	
 	
@@ -136,7 +185,7 @@ public class RestaurantServiceImpl implements RestaurantService {
      BigDecimal maxLon = geoResult.getLon().add(BigDecimal.valueOf(radius));
      Pageable limitPage = PageRequest.of(0, limit);
         
-     return restaurantMapper.toDto2(
+     return restaurantMapper.toDetailResDto(
              restaurantRepository.findNearbyRestaurantsWithDetail(
                  minLat, maxLat, minLon, maxLon,
                  geoResult.getLat(), geoResult.getLon(),
@@ -151,7 +200,7 @@ public class RestaurantServiceImpl implements RestaurantService {
   */
  public List<RestaurantDetailResDto> findRestaurantsByEmdQueryDsl(String emd, int limit) {
      Pageable limitPage = PageRequest.of(0, limit);
-     return restaurantMapper.toDto2(restaurantRepository.findRestaurantsByEmdRandom(emd, limitPage));
+     return restaurantMapper.toDetailResDto(restaurantRepository.findRestaurantsByEmdRandom(emd, limitPage));
  }
 	
 	/**
