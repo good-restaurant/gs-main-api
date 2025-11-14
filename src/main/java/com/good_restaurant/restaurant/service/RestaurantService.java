@@ -1,8 +1,12 @@
 package com.good_restaurant.restaurant.service;
 
+import com.good_restaurant.restaurant.domain.Restaurant;
+import com.good_restaurant.restaurant.domain.RestaurantComment;
 import com.good_restaurant.restaurant.dto.RestaurantCoordinateResDto;
 import com.good_restaurant.restaurant.dto.RestaurantDetailResDto;
 import com.good_restaurant.restaurant.dto.RestaurantDto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -73,4 +77,13 @@ public interface RestaurantService {
 	 */
 	List<RestaurantCoordinateResDto> getEntireRestaurantCoordinatesApplication(int limit);
 	
+	Page<Restaurant> getRestaurantsAsPage(Pageable pageable);
+	
+	Restaurant findRestaurantsById(Long id);
+	
+	Restaurant save(Restaurant entity);
+	
+	Restaurant updateRestaurant(Long id, Restaurant entity);
+	
+	Restaurant delete(Long id);
 }
