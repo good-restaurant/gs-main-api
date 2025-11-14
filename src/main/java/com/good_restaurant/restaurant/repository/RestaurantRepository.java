@@ -2,6 +2,7 @@ package com.good_restaurant.restaurant.repository;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 import com.good_restaurant.restaurant.domain.Restaurant;
 import com.good_restaurant.restaurant.dto.RestaurantDetailResDto;
@@ -13,6 +14,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 public interface RestaurantRepository extends JpaRepository<Restaurant, Long>, RestaurantQueryDslRepository {
+	
+	@Override
+	Optional<Restaurant> findById(Long aLong);
 	
 	@Override
 	@EntityGraph(attributePaths = {"restaurantMenus", "restaurantPictures"})
