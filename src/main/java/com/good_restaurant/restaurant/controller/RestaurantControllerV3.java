@@ -33,7 +33,7 @@ public class RestaurantControllerV3 {
 			@RequestParam(defaultValue = "100") Integer limit) {
 		List<Restaurant> restaurantList = serviceV3.randomLimit(limit);
 		
-		return ResponseEntity.ok(mapper.toDto3(restaurantList));
+		return ResponseEntity.ok(mapper.toCoordinateDto(restaurantList));
 	}
 	
 	/**
@@ -49,7 +49,7 @@ public class RestaurantControllerV3 {
 		List<Restaurant> restaurantList = serviceV3.getEmdLikeRestaurants(emd);
 		List<Restaurant> filteredRestaurantByLimit = serviceV3.limitFilter(limit, restaurantList);
 		
-		return ResponseEntity.ok(mapper.toDto3(filteredRestaurantByLimit));
+		return ResponseEntity.ok(mapper.toCoordinateDto(filteredRestaurantByLimit));
 	}
 	
 	/**
@@ -65,7 +65,7 @@ public class RestaurantControllerV3 {
 			@RequestParam(defaultValue = "0.1") Double radius,
 			@RequestParam(defaultValue = "20") Integer limit) {
 		List<Restaurant> restaurantList = serviceV3.getnearRestaurants(address, radius, limit);
-		return ResponseEntity.ok(mapper.toDto2(restaurantList));
+		return ResponseEntity.ok(mapper.toDetailResDto(restaurantList));
 	}
 	
 	/**
@@ -84,7 +84,7 @@ public class RestaurantControllerV3 {
 			@RequestParam(defaultValue = "250") Double radius,
 			@RequestParam(defaultValue = "20") Integer limit) {
 		List<Restaurant> restaurantList = serviceV3.getLocatedRestaurants(lat, lon, radius, limit);
-		return ResponseEntity.ok(mapper.toDto2(restaurantList));
+		return ResponseEntity.ok(mapper.toDetailResDto(restaurantList));
 	}
 
 	/**
@@ -99,7 +99,7 @@ public class RestaurantControllerV3 {
 		List<Restaurant> restaurantList = serviceV3.getEmdRestaurants(emd);
 		List<Restaurant> filteredRestaurantByLimit = serviceV3.limitFilter(limit, restaurantList);
 		
-		return ResponseEntity.ok(mapper.toDto2(filteredRestaurantByLimit));
+		return ResponseEntity.ok(mapper.toDetailResDto(filteredRestaurantByLimit));
 	}
 
 	/**
@@ -145,7 +145,7 @@ public class RestaurantControllerV3 {
 	public ResponseEntity<RestaurantFullDto> findRestaurantsById(
 			@PathVariable("id") Long id) {
 		Restaurant restaurant = serviceV3.getById(id);
-		return ResponseEntity.ok(mapper.toDto4(restaurant));
+		return ResponseEntity.ok(mapper.toFullDto(restaurant));
 	}
 	
 	/**
@@ -161,6 +161,6 @@ public class RestaurantControllerV3 {
 		List<Restaurant> restaurantList = serviceV3.getAll();
 		List<Restaurant> filteredRestaurantByLimit = serviceV3.limitFilter(limit, restaurantList);
 		
-		return ResponseEntity.ok(mapper.toDto4(filteredRestaurantByLimit));
+		return ResponseEntity.ok(mapper.toFullDto(filteredRestaurantByLimit));
 	}
 }
