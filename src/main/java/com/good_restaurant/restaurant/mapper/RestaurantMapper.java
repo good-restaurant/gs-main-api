@@ -1,7 +1,6 @@
 package com.good_restaurant.restaurant.mapper;
 
 import com.good_restaurant.restaurant.domain.Restaurant;
-import com.good_restaurant.restaurant.domain.RestaurantComment;
 import com.good_restaurant.restaurant.domain.RestaurantMenu;
 import com.good_restaurant.restaurant.domain.RestaurantPicture;
 import com.good_restaurant.restaurant.dto.RestaurantFullDto;
@@ -32,38 +31,36 @@ public interface RestaurantMapper {
 	
 	Restaurant toEntity(RestaurantIdDto restaurantIdDto);
 	
-	RestaurantIdDto toDto1(Restaurant restaurant);
+	RestaurantIdDto toIdDto(Restaurant restaurant);
 	
 	@BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 	Restaurant partialUpdate(RestaurantIdDto restaurantIdDto, @MappingTarget Restaurant restaurant);
 	
 	Restaurant toEntity(RestaurantDetailResDto restaurantDetailResDto);
 	
-	RestaurantDetailResDto toDto2(Restaurant restaurant);
+	RestaurantDetailResDto toDetailResDto(Restaurant restaurant);
 	
 	@BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 	Restaurant partialUpdate(RestaurantDetailResDto restaurantDetailResDto, @MappingTarget Restaurant restaurant);
 	
 	Restaurant toEntity(RestaurantCoordinateResDto restaurantCoordinateResDto);
 	
-	RestaurantCoordinateResDto toDto3(Restaurant restaurant);
+	RestaurantCoordinateResDto toCoordinateDto(Restaurant restaurant);
 	
 	@BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 	Restaurant partialUpdate(RestaurantCoordinateResDto restaurantCoordinateResDto, @MappingTarget Restaurant restaurant);
 	
-	List<RestaurantCoordinateResDto> toDto3(List<Restaurant> restaurants);
+	List<RestaurantCoordinateResDto> toCoordinateDto(List<Restaurant> restaurants);
 	
-	List<RestaurantCoordinateResDto> toDto(List<Restaurant> limitedRestaurants);
-	
-	List<RestaurantDetailResDto> toDto2(List<Restaurant> nearbyRestaurantsWithDetail);
+	List<RestaurantDetailResDto> toDetailResDto(List<Restaurant> nearbyRestaurantsWithDetail);
 	
 	@Mapping(source = "restaurantPictures", target = "restaurantPictures")
 	Restaurant toEntity(RestaurantFullDto restaurantFullDto);
 	
 	@Mapping(source = "restaurantPictures", target = "restaurantPictures")
-	RestaurantFullDto toDto4(Restaurant restaurant);
+	RestaurantFullDto toFullDto(Restaurant restaurant);
 	
-	List<RestaurantFullDto> toDto4(List<Restaurant> restaurant);
+	List<RestaurantFullDto> toFullDto(List<Restaurant> restaurant);
 	
 	@BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 	Restaurant partialUpdate(RestaurantFullDto restaurantFullDto, @MappingTarget Restaurant restaurant);

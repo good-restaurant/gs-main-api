@@ -15,6 +15,8 @@ import com.good_restaurant.restaurant.service.SignedUrlUploadService;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -72,5 +74,26 @@ public class RestaurantMenuServiceImpl implements RestaurantMenuService, BaseCRU
 		
 		
 		return repository.save(updatedPicture);
+	}
+	
+	@Override
+	public Page<RestaurantMenu> getMenusAsPage(Pageable pageable) {
+		return repository.findAll(pageable);
+	}
+	
+	@Override
+	public RestaurantMenu findMenuById(Long id) {
+		return repository.findById(id).orElse(null);
+	}
+	
+	@Override
+	public RestaurantMenu save(RestaurantMenu menu) {
+		return save(menu);
+	}
+	
+	@SneakyThrows
+	@Override
+	public RestaurantMenu updateMenu(Long id, RestaurantMenu newMenu) {
+		return updateById(id, newMenu);
 	}
 }
