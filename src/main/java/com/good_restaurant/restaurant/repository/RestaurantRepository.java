@@ -90,7 +90,7 @@ public interface RestaurantRepository extends JpaRepository<Restaurant, Long>, R
 	
 	List<Restaurant> findByEmdKorNmContainsOrEmdKorNmLike(String emdKorNm, String emdKorNm1);
 	
-	List<Restaurant> findByRestaurantNameLikeIgnoreCase(@Nullable String restaurantName);
+	List<Restaurant> findByRestaurantNameContainingIgnoreCase(@Nullable String restaurantName);
 	
 	List<Restaurant> findByAddressContainingIgnoreCase(String onlyNum);
 }

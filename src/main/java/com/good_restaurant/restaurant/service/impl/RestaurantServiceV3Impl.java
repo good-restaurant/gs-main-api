@@ -13,7 +13,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.util.*;
 
 @Service
@@ -164,7 +163,7 @@ public class RestaurantServiceV3Impl implements RestaurantServiceV3, BaseCRUD<Re
 			return randomLimit(100);
 		}
 		
-		return repository.findByRestaurantNameLikeIgnoreCase(searchQuery.trim());
+		return repository.findByRestaurantNameContainingIgnoreCase(searchQuery.trim());
 	}
 	
 	@Override
