@@ -65,5 +65,8 @@ deploy:
 
   script:
     - docker pull "$CI_REGISTRY_IMAGE:$IMAGE_TAG"
-    - docker compose -f docker-compose.yml -f compose.ci.yaml up -d
+    # 현재 프로파일 관련 컨테이너만 down
+    - docker compose -f docker-compose.yml -f compose.ci.yaml down
+    # 완전한 재기동
+    - docker compose -f docker-compose.yml -f compose.ci.yaml up -d --build --force-recreate
     - docker compose ps

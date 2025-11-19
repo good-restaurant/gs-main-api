@@ -13,10 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @AllArgsConstructor
@@ -95,7 +92,7 @@ public class RestaurantServiceV3Impl implements RestaurantServiceV3, BaseCRUD<Re
 	
 	@Override
 	public List<Restaurant> getEmdRestaurants(String emd) {
-		return repository.findByEmdKorNm(emd);
+		return repository.findByEmdKorNmContaining(emd);
 	}
 	
 	@Override
@@ -156,5 +153,90 @@ public class RestaurantServiceV3Impl implements RestaurantServiceV3, BaseCRUD<Re
 	private double meterToLongitudeDegree(double meters, double latitude) {
 		double latRad = Math.toRadians(latitude);
 		return meters / (111_320.0 * Math.cos(latRad));
+	}
+	
+	
+	@Override
+	public List<Restaurant> getRestaurantsName(String searchQuery) {
+		// ## 방어 코드
+		if (searchQuery == null || searchQuery.isBlank()) {
+			return randomLimit(100);
+		}
+		
+		return repository.findByRestaurantNameContainingIgnoreCase(searchQuery.trim());
+	}
+	
+	@Override
+	public List<Restaurant> getRoadNameAddressRestaurants(String searchQuery) {
+		
+		// ## 방어 코드
+		if (searchQuery == null || searchQuery.isBlank()) {
+			return List.of();
+		}
+		
+		String q = normalizeRoadName(searchQuery);
+		
+		// ## 1차: 기본 검색
+		List<Restaurant> result = repository.findByAddressContainingIgnoreCase(q);
+		if (!result.isEmpty()) return result;
+		
+		// ## 2차: 숫자 공백 제거 후 재검색 (ex: "저동길 165" → "저동길165")
+		String noSpaceNum = q.replaceAll("([가-힣A-Za-z])\\s+(\\d)", "$1$2");
+		if (!noSpaceNum.equals(q)) {
+			result = repository.findByAddressContainingIgnoreCase(noSpaceNum);
+			if (!result.isEmpty()) return result;
+		}
+		
+		// ## 3차: 숫자만 남기기 (건물번호 앞자리로만 찾을 때)
+		String onlyNum = q.replaceAll("[^0-9]", "");
+		if (!onlyNum.isEmpty()) {
+			result = repository.findByAddressContainingIgnoreCase(onlyNum);
+			if (!result.isEmpty()) return result;
+		}
+		
+		// ## 4차: 도로명만 추출 후 검색 (저동길 / 저동로 / 저동대로 등)
+		String roadNameOnly = q.replaceAll("[0-9].*", ""); // 숫자 이후 삭제
+		roadNameOnly = roadNameOnly.trim();
+		if (!roadNameOnly.isEmpty() && !roadNameOnly.equals(q)) {
+			result = repository.findByAddressContainingIgnoreCase(roadNameOnly);
+			if (!result.isEmpty()) return result;
+		}
+		
+		return List.of();
+	}
+	
+	
+	// ## 검색어 전처리
+	private String normalizeRoadName(String input) {
+		String q = input.trim();
+		
+		// ## 한글 자모 분리된 경우 대비 (Normalization Form C)
+		q = java.text.Normalizer.normalize(q, java.text.Normalizer.Form.NFC);
+		
+		// ## 주소에서 흔히 등장하는 괄호 제거
+		q = q.replaceAll("\\([^)]*\\)", "");  // (저동)
+		
+		// ## 불필요한 중복 공백 제거
+		q = q.replaceAll("\\s+", " ");
+		
+		return q;
+	}
+	
+	@Override
+	public List<Restaurant> removeDistinct(List<Restaurant>... lists) {
+		// ## 결과 저장용 Set (ID로 중복 제거)
+		Map<Long, Restaurant> map = new LinkedHashMap<>();
+		
+		// ## 인자로 들어온 모든 리스트 순회
+		for (List<Restaurant> list : lists) {
+			if (list == null) continue;
+			for (Restaurant r : list) {
+				if (r == null) continue;
+				map.put(r.getId(), r); // ID 기준 중복 제거
+			}
+		}
+		
+		// ## 순서 보존 + 중복 제거된 결과
+		return new ArrayList<>(map.values());
 	}
 }

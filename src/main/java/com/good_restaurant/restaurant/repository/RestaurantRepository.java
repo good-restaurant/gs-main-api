@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.lang.Nullable;
 
 public interface RestaurantRepository extends JpaRepository<Restaurant, Long>, RestaurantQueryDslRepository {
 	
@@ -81,11 +82,15 @@ public interface RestaurantRepository extends JpaRepository<Restaurant, Long>, R
 	List<RestaurantDetailResDto> findRestaurantsByEmd(String emd, Pageable pageable);
 	
 	// 행정동기준 조회, 문자열 일치해야함
-	List<Restaurant> findByEmdKorNm(String emd);
+	List<Restaurant> findByEmdKorNmContaining(String emd);
 	
 	List<Restaurant> findByLatBetweenAndLonBetween(double minLat, double maxLat, double minLon, double maxLon, PageRequest of);
 	
 	List<Restaurant> findByEmdKorNmLike(String emdKorNm);
 	
 	List<Restaurant> findByEmdKorNmContainsOrEmdKorNmLike(String emdKorNm, String emdKorNm1);
+	
+	List<Restaurant> findByRestaurantNameContainingIgnoreCase(@Nullable String restaurantName);
+	
+	List<Restaurant> findByAddressContainingIgnoreCase(String onlyNum);
 }
