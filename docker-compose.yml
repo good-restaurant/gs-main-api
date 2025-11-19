@@ -45,5 +45,5 @@ services:
       - "18993:18993"
     volumes:
       - ./certs:/etc/ssl/local:ro
-      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
     command: ["nginx", "-g", "daemon off;"]
