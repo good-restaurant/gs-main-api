@@ -101,7 +101,33 @@ public class RestaurantControllerV3 {
 		
 		return ResponseEntity.ok(mapper.toDetailResDto(filteredRestaurantByLimit));
 	}
-
+	
+	/**
+	 * searchQuery 는 일종의 통합검색처럼 작동하는 영역입니다.
+	 * 몇 가지 조회 로직에 의해 나온 조회결과를 or 조건으로 다 가져옵니다.
+	 * 그래도 중복은 뺍니다.
+	 *
+	 * @param searchQuery 행정동
+	 * @return 주변 음식점 리스트
+	 */
+	@GetMapping("/search")
+	public ResponseEntity<List<RestaurantDetailResDto>> findRestaurantsByTotalQuery(
+			@RequestParam String searchQuery,
+			@RequestParam(defaultValue = "20") Integer limit) {
+		List<Restaurant> restaurantList = serviceV3.getRestaurantsName(searchQuery);
+		List<Restaurant> restaurantList2 = serviceV3.getEmdRestaurants(searchQuery);
+		List<Restaurant> restaurantList3 = serviceV3.getRoadNameAddressRestaurants(searchQuery);
+		List<Restaurant> restaurantDistinctRemoved = serviceV3.removeDistinct(
+				restaurantList,
+				restaurantList2,
+				restaurantList3
+		);
+		
+		List<Restaurant> filteredRestaurantByLimit = serviceV3.limitFilter(limit, restaurantDistinctRemoved);
+		
+		return ResponseEntity.ok(mapper.toDetailResDto(filteredRestaurantByLimit));
+	}
+	
 	/**
 	 * 음식점 데이터를 생성합니다.
 	 * @param dto 음식점 생성 요청 DTO
