@@ -17,6 +17,11 @@ spring:
         format_sql: true
         show_sql: true
         default_batch_fetch_size: 1000
+  servlet:
+# multipart MAX size is 500 MB, but CF-max-upload is 100MB
+    multipart:
+      max-file-size: 500MB
+      max-request-size: 500MB
 
 server:
   forward-headers-strategy: framework   # for https behind a proxy
