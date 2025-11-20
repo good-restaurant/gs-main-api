@@ -33,10 +33,17 @@ public class RestaurantMenu {
 	@Column(name = "picture_uuid")
 	private UUID pictureUuid;
 	
+	@Size(max = 512)
+	@Column(name = "s3_object_key", length = 512)
+	private String s3ObjectKey;
+	
+	@Size(max = 255)
+	@Column(name = "original_filename")
+	private String originalFilename;
+	
 	@NotNull
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@OnDelete(action = OnDeleteAction.CASCADE)
 	@JoinColumn(name = "restaurant_id", nullable = false)
 	private Restaurant restaurant;
-	
 }
