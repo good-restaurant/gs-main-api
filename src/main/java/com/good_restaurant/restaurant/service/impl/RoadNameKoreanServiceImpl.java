@@ -57,6 +57,19 @@ public class RoadNameKoreanServiceImpl implements RoadNameKoreanService, BaseCRU
 		List<Road도로명주소한글> wide =
 				repository.searchWide(query, PageRequest.of(0, 20));
 		
+		log.info("wide size: {}", wide.size());
+		log.debug("wide-search-result count: {}", wide.size());
+		wide.forEach(r -> {
+			log.debug("{} {} {} {}-{}",
+					r.get시도명(),
+					r.get시군구명(),
+					r.get도로명(),
+					r.get건물본번(),
+					r.get건물부번()
+			);
+		});
+		
+		
 		// 3. 후보 병합 (중복 제거)
 		List<Road도로명주소한글> merged = Stream.concat(primary.stream(), wide.stream())
 				                       .collect(Collectors.collectingAndThen(
