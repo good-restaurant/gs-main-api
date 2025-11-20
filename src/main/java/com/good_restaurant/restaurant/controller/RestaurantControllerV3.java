@@ -1,13 +1,12 @@
 package com.good_restaurant.restaurant.controller;
 
 import com.good_restaurant.restaurant.domain.Restaurant;
-import com.good_restaurant.restaurant.dto.RestaurantCoordinateResDto;
-import com.good_restaurant.restaurant.dto.RestaurantDetailResDto;
-import com.good_restaurant.restaurant.dto.RestaurantDto;
-import com.good_restaurant.restaurant.dto.RestaurantFullDto;
+import com.good_restaurant.restaurant.dto.*;
 import com.good_restaurant.restaurant.mapper.RestaurantMapper;
+import com.good_restaurant.restaurant.mapper.RoadNameKoreanMapper;
 import com.good_restaurant.restaurant.service.A_Exception.MergePropertyException;
 import com.good_restaurant.restaurant.service.RestaurantServiceV3;
+import com.good_restaurant.restaurant.service.RoadNameKoreanService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +21,8 @@ public class RestaurantControllerV3 {
 
 	private final RestaurantServiceV3 serviceV3;
 	private final RestaurantMapper mapper;
+	private final RoadNameKoreanService roadNameKoreanService;
+	private final RoadNameKoreanMapper roadNameKoreanMapper;
 
 	/**
 	 * 전체 음식점 좌표를 랜덤으로 조회합니다.
@@ -64,7 +65,8 @@ public class RestaurantControllerV3 {
 			@RequestParam String address,
 			@RequestParam(defaultValue = "0.1") Double radius,
 			@RequestParam(defaultValue = "20") Integer limit) {
-		List<Restaurant> restaurantList = serviceV3.getnearRestaurants(address, radius, limit);
+		String finalAddress = roadNameKoreanService.buildFullAddress(roadNameKoreanService.searchCandidates(address));
+		List<Restaurant> restaurantList = serviceV3.getnearRestaurants(finalAddress, radius, limit);
 		return ResponseEntity.ok(mapper.toDetailResDto(restaurantList));
 	}
 	
