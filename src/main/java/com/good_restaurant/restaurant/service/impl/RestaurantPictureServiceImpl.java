@@ -1,6 +1,7 @@
 package com.good_restaurant.restaurant.service.impl;
 
 import com.good_restaurant.restaurant.domain.Restaurant;
+import com.good_restaurant.restaurant.domain.RestaurantComment;
 import com.good_restaurant.restaurant.domain.RestaurantPicture;
 import com.good_restaurant.restaurant.dto.UploadResult;
 import com.good_restaurant.restaurant.repository.RestaurantPictureRepository;
@@ -13,6 +14,10 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -79,5 +84,16 @@ public class RestaurantPictureServiceImpl implements RestaurantPictureService, B
 				                            .build();
 		
 		return repository.save(picture);
+	}
+	
+	@Override
+	public Page<RestaurantPicture> getRecentPicture(Pageable pageable) {
+		Pageable sorted = PageRequest.of(
+					pageable.getPageNumber(),
+					pageable.getPageSize(),
+					Sort.by(Sort.Direction.DESC, "id")   // 최신순
+			);
+			
+			return repository.findAll(sorted);
 	}
 }
