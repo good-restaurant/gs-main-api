@@ -13,7 +13,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -95,4 +97,96 @@ public class RoadNameKoreanServiceImpl implements RoadNameKoreanService, BaseCRU
 		
 		return sb.toString().trim();
 	}
+	
+	
+	// 가나다순 정렬 유틸
+	private static Comparator<String> STRING_ASC = Comparator.nullsLast(String::compareToIgnoreCase);
+	
+	@Override
+	public List<String> getProvinceList() {
+		return getRepository().findAll().stream()
+				       .map(Road도로명주소한글::get시도명)
+				       .filter(Objects::nonNull)
+				       .distinct()
+				       .sorted(STRING_ASC)
+				       .collect(Collectors.toList());
+	}
+	
+	@Override
+	public List<String> getCityList(String province) {
+		return getRepository().findAll().stream()
+				       .filter(r -> province.equals(r.get시도명()))
+				       .map(Road도로명주소한글::get시군구명)
+				       .filter(Objects::nonNull)
+				       .distinct()
+				       .sorted(STRING_ASC)
+				       .collect(Collectors.toList());
+	}
+	
+	@Override
+	public List<String> getTownList(String city) {
+		return getRepository().findAll().stream()
+				       .filter(r -> city.equals(r.get시군구명()))
+				       .map(r -> {
+					       // 동 기준: 법정읍면동명 → 법정리명 있으면 리까지
+					       if (r.get법정리명() != null && !r.get법정리명().isEmpty()) {
+						       return r.get법정읍면동명() + " " + r.get법정리명();
+					       }
+					       return r.get법정읍면동명();
+				       })
+				       .filter(Objects::nonNull)
+				       .distinct()
+				       .sorted(STRING_ASC)
+				       .collect(Collectors.toList());
+	}
+	
+	
+	@Override
+	public List<String> searchProvinces(String query, int limit) {
+		String q = query.trim();
+		
+		return getRepository().findAll().stream()
+				       .map(Road도로명주소한글::get시도명)
+				       .filter(Objects::nonNull)
+				       .filter(p -> p.contains(q))
+				       .distinct()
+				       .sorted(String::compareToIgnoreCase)
+				       .limit(limit)
+				       .collect(Collectors.toList());
+	}
+	
+	@Override
+	public List<String> searchCities(String query, int limit) {
+		String q = query.trim();
+		
+		return getRepository().findAll().stream()
+				       .map(r -> r.get시군구명())
+				       .filter(Objects::nonNull)
+				       .filter(c -> c.contains(q))
+				       .distinct()
+				       .sorted(String::compareToIgnoreCase)
+				       .limit(limit)
+				       .collect(Collectors.toList());
+	}
+	
+	@Override
+	public List<String> searchTowns(String query, int limit) {
+		String q = query.trim();
+		
+		return getRepository().findAll().stream()
+				       .map(r -> {
+					       // 동 + 리 조립
+					       if (r.get법정리명() != null && !r.get법정리명().isEmpty()) {
+						       return r.get법정읍면동명() + " " + r.get법정리명();
+					       }
+					       return r.get법정읍면동명();
+				       })
+				       .filter(Objects::nonNull)
+				       .filter(t -> t.contains(q))
+				       .distinct()
+				       .sorted(String::compareToIgnoreCase)
+				       .limit(limit)
+				       .collect(Collectors.toList());
+	}
+	
 }
