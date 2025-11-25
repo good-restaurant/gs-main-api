@@ -12,7 +12,10 @@ import com.good_restaurant.restaurant.service.SignedUrlUploadService;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -45,6 +48,17 @@ public class RestaurantCommentServiceImpl implements RestaurantCommentService, B
 		Optional<RestaurantComment> optional = repository.findById(aLong);
 		repository.deleteById(aLong);
 		return optional.orElse(null);
+	}
+	
+	@Override
+	public Page<RestaurantComment> getRecentComments(Pageable pageable) {
+		Pageable sorted = PageRequest.of(
+				pageable.getPageNumber(),
+				pageable.getPageSize(),
+				Sort.by(Sort.Direction.DESC, "createdAt")   // 최신순
+		);
+		
+		return repository.findAll(sorted);
 	}
 	
 	@Override

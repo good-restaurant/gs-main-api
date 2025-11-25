@@ -6,7 +6,9 @@ import com.good_restaurant.restaurant.dto.RestaurantCommentDto;
 import com.good_restaurant.restaurant.mapper.RestaurantCommentMapper;
 import com.good_restaurant.restaurant.service.RestaurantCommentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -53,6 +55,27 @@ public class CommentController {
 		RestaurantCommentFullDto dto = mapper.toFullDto(entity);
 		
 		return ResponseEntity.ok(dto);
+	}
+	
+	/**
+	 * 최근 코멘트를 페이지 형태로 조회합니다.
+	 *
+	 * @param pageable 페이지 정보 (size: 20 / 50 / 100) 권장
+	 * @return 코멘트 목록 페이지
+	 */
+	@GetMapping("/recent")
+	public ResponseEntity<Page<RestaurantCommentFullDto>> getRecentComments(
+//			기본값 최근 20개씩
+			@PageableDefault(size = 20)  Pageable pageable
+	) {
+		
+		// 최근 코멘트 페이지 조회
+		Page<RestaurantComment> page = service.getRecentComments(pageable);
+		
+		// 엔티티 -> DTO 변환
+		Page<RestaurantCommentFullDto> dtoPage = page.map(mapper::toFullDto);
+		
+		return ResponseEntity.ok(dtoPage);
 	}
 	
 	@PostMapping
