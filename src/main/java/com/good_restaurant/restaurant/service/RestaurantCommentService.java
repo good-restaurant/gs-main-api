@@ -1,6 +1,7 @@
 package com.good_restaurant.restaurant.service;
 
 import com.good_restaurant.restaurant.domain.RestaurantComment;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
@@ -16,4 +17,6 @@ public interface RestaurantCommentService {
 	RestaurantComment updateComment(Long id, RestaurantComment entity);
 	
 	RestaurantComment delete(Long id);
+	
+	Page<RestaurantComment> getRecentComments(Pageable pageable);
 }
