@@ -150,29 +150,24 @@ public class RoadNameKoreanServiceImpl implements RoadNameKoreanService, BaseCRU
 	
 	@Override
 	public List<String> searchProvinces(String query, int limit) {
-		String q = query.trim();
-		
-		return getRepository().findAll().stream()
-				       .map(Road도로명주소한글::get시도명)
+		return repository
+				       .findDistinct시도명By시도명Containing(query.trim(),
+						       PageRequest.of(0, 1000))
+				       .stream()
+				       .map(Road도로명주소한글::get시도명)  // 여기서 필드 추출
 				       .filter(Objects::nonNull)
-				       .filter(p -> p.contains(q))
-				       .distinct()
-				       .sorted(String::compareToIgnoreCase)
-				       .limit(limit)
 				       .collect(Collectors.toList());
 	}
 	
 	@Override
 	public List<String> searchCities(String query, int limit) {
-		String q = query.trim();
-		
-		return getRepository().findAll().stream()
-				       .map(r -> r.get시군구명())
+		return repository
+				       .findDistinct시군구명By시군구명Containing(query.trim(),
+						       PageRequest.of(0, 1000))
+				       .stream()
+				       .map(Road도로명주소한글::get시군구명)  // 여기서 필드 추출
+				       .map(s -> s == null ? "세종특별자치시" : s) // 세종 예외 처리
 				       .filter(Objects::nonNull)
-				       .filter(c -> c.contains(q))
-				       .distinct()
-				       .sorted(String::compareToIgnoreCase)
-				       .limit(limit)
 				       .collect(Collectors.toList());
 	}
 	
@@ -180,18 +175,26 @@ public class RoadNameKoreanServiceImpl implements RoadNameKoreanService, BaseCRU
 	public List<String> searchTowns(String query, int limit) {
 		String q = query.trim();
 		
-		return getRepository().findAll().stream()
-				       .map(r -> {
-					       // 동 + 리 조립
-					       if (r.get법정리명() != null && !r.get법정리명().isEmpty()) {
-						       return r.get법정읍면동명() + " " + r.get법정리명();
-					       }
-					       return r.get법정읍면동명();
-				       })
-				       .filter(Objects::nonNull)
-				       .filter(t -> t.contains(q))
+		List<Road도로명주소한글> 읍면동 = repository
+				                   .findDistinct법정읍면동명By법정읍면동명Containing(q, PageRequest.of(0, 10000));
+		
+		List<Road도로명주소한글> 리 = repository
+				                 .findDistinct법정리명By법정리명Containing(q, PageRequest.of(0, 10000));
+		
+		List<String> String읍면동 = 읍면동.stream().map(Road도로명주소한글::get법정읍면동명).collect(Collectors.toList());
+		List<String> String리 = 리.stream().map(Road도로명주소한글::get법정리명).collect(Collectors.toList());
+		
+		List<String> result = new ArrayList<>();
+		
+		// 읍면동 단독
+		result.addAll(String읍면동);
+		
+		// 리 조합
+		result.addAll(String리);
+		
+		return result.stream()
 				       .distinct()
-				       .sorted(String::compareToIgnoreCase)
+				       .sorted(String.CASE_INSENSITIVE_ORDER)
 				       .limit(limit)
 				       .collect(Collectors.toList());
 	}
