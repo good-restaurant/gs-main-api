@@ -102,6 +102,8 @@ public class RoadNameKoreanServiceImpl implements RoadNameKoreanService, BaseCRU
 	
 	// 가나다순 정렬 유틸
 	private static Comparator<String> STRING_ASC = Comparator.nullsLast(String::compareToIgnoreCase);
+	// 시 할당 없는 세종시를 위한 시군수 매핑을 위한 고정 값
+	private static final String SEJONG = "세종특별자치시";
 	
 	@Override
 	public List<String> getProvinceList() {
@@ -113,6 +115,9 @@ public class RoadNameKoreanServiceImpl implements RoadNameKoreanService, BaseCRU
 	@Override
 	public List<String> getCityList() {
 		return repository.findAllDistinctBy시군구명().stream()
+						// null 주소 세종시에 할당하여 FE에 전달
+						// BE에서 세종을 전달하면 null 케이스를 해석해야 하는 문제 보유
+				       .map(s -> s == null || s.isBlank() ? SEJONG : s)
 				       .sorted(STRING_ASC)
 				       .collect(Collectors.toList());
 	}
