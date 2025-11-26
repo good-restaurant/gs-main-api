@@ -6,6 +6,7 @@ import com.good_restaurant.restaurant.service.A_Exception.MergePropertyException
 import com.good_restaurant.restaurant.service.A_base.BaseCRUD;
 import com.good_restaurant.restaurant.service.A_base.ServiceHelper;
 import com.good_restaurant.restaurant.service.RoadNameKoreanService;
+import com.querydsl.core.Tuple;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -104,39 +105,40 @@ public class RoadNameKoreanServiceImpl implements RoadNameKoreanService, BaseCRU
 	
 	@Override
 	public List<String> getProvinceList() {
-		return getRepository().findAll().stream()
-				       .map(Road도로명주소한글::get시도명)
-				       .filter(Objects::nonNull)
-				       .distinct()
+		return repository.findAllDistinctBy시도명().stream()
 				       .sorted(STRING_ASC)
 				       .collect(Collectors.toList());
 	}
 	
 	@Override
-	public List<String> getCityList(String province) {
-		return getRepository().findAll().stream()
-				       .filter(r -> province.equals(r.get시도명()))
-				       .map(Road도로명주소한글::get시군구명)
-				       .filter(Objects::nonNull)
-				       .distinct()
+	public List<String> getCityList() {
+		return repository.findAllDistinctBy시군구명().stream()
 				       .sorted(STRING_ASC)
 				       .collect(Collectors.toList());
 	}
 	
 	@Override
-	public List<String> getTownList(String city) {
-		return getRepository().findAll().stream()
-				       .filter(r -> city.equals(r.get시군구명()))
-				       .map(r -> {
-					       // 동 기준: 법정읍면동명 → 법정리명 있으면 리까지
-					       if (r.get법정리명() != null && !r.get법정리명().isEmpty()) {
-						       return r.get법정읍면동명() + " " + r.get법정리명();
-					       }
-					       return r.get법정읍면동명();
-				       })
-				       .filter(Objects::nonNull)
+	public List<String> getTownList() {
+		List<Tuple> rows = repository.findAllDistinctBy법정읍면동리명();
+		
+		List<String> result = new ArrayList<>();
+		
+		for (Tuple t : rows) {
+			String 읍면동 = t.get(0, String.class);
+			String 리 = t.get(1, String.class);
+			
+			if (리 == null || 리.isBlank()) {
+				// 리가 없는 경우: 읍면동 단독
+				result.add(읍면동);
+			} else {
+				// 리가 있는 경우: 읍면동 + 리
+				result.add(리);
+			}
+		}
+		
+		return result.stream()
 				       .distinct()
-				       .sorted(STRING_ASC)
+				       .sorted(String::compareToIgnoreCase)
 				       .collect(Collectors.toList());
 	}
 	

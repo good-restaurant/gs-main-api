@@ -29,29 +29,25 @@ public class AddressListController {
 	}
 	
 	/**
-	 * 특정 시도의 시군구 목록을 반환합니다.
+	 * 전체 주소의 시군구 목록을 반환합니다.
 	 *
-	 * @param province 시도명
 	 * @return 시군구 리스트
 	 */
 	@GetMapping("/cities")
 	public ResponseEntity<List<String>> getCities(
-			@RequestParam String province
 	) {
-		return ResponseEntity.ok(service.getCityList(province));
+		return ResponseEntity.ok(service.getCityList());
 	}
 	
 	/**
-	 * 특정 시군구의 읍면동/리 목록을 반환합니다.
+	 * 전체 주소의 읍면동/리 목록을 반환합니다.
 	 *
-	 * @param city 시군구명
 	 * @return 동/리 리스트
 	 */
 	@GetMapping("/towns")
 	public ResponseEntity<List<String>> getTowns(
-			@RequestParam String city
 	) {
-		return ResponseEntity.ok(service.getTownList(city));
+		return ResponseEntity.ok(service.getTownList());
 	}
 	
 	

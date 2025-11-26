@@ -13,9 +13,9 @@ public interface RoadNameKoreanService extends BaseCRUD<Road도로명주소한�
 	
 	List<String> getProvinceList();
 	
-	List<String> getCityList(String province);
+	List<String> getCityList();
 	
-	List<String> getTownList(String city);
+	List<String> getTownList();
 	
 	List<String> searchProvinces(String query, int limit);
 	
