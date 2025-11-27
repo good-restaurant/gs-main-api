@@ -55,4 +55,6 @@ public interface RestaurantServiceV3 extends BaseCRUD<Restaurant, Long> {
 	 * @return 중복 제거된 Restaurant 리스트
 	 */
 	List<Restaurant> removeDistinct(List<Restaurant>... lists);
+	
+	List<Restaurant> getAddressRestaurants(String province, String city, String town);
 }

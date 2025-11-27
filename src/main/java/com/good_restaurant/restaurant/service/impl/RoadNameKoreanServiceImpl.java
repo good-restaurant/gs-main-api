@@ -7,6 +7,7 @@ import com.good_restaurant.restaurant.service.A_base.BaseCRUD;
 import com.good_restaurant.restaurant.service.A_base.ServiceHelper;
 import com.good_restaurant.restaurant.service.RoadNameKoreanService;
 import com.querydsl.core.Tuple;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -27,6 +28,34 @@ public class RoadNameKoreanServiceImpl implements RoadNameKoreanService, BaseCRU
 	
 	private final RoadNameKoreanRepository repository;
 	private final ServiceHelper<Road도로명주소한글, String> serviceHelper;
+	
+	List<String> provinces;
+	List<String> cities;
+	List<String> towns;
+	
+	@PostConstruct
+	public void preload() {
+		this.provinces = repository.findAllDistinctBy시도명()
+				                 .stream().sorted().toList();
+		
+		this.cities = repository.findAllDistinctBy시군구명()
+				              .stream()
+				              .map(s -> s == null ? "세종특별자치시" : s)
+				              .sorted()
+				              .toList();
+		
+		this.towns = repository.findAllDistinctBy법정읍면동리명()
+				             .stream()
+				             .map(t -> {
+					             String emd = t.get(0, String.class);
+					             String ri = t.get(1, String.class);
+					             return ri == null ? emd : ri;
+				             })
+				             .distinct()
+				             .sorted()
+				             .toList();
+	}
+
 	
 	@Override
 	public Road도로명주소한글 updateRule(Road도로명주소한글 source, Road도로명주소한글 target) throws MergePropertyException {
@@ -100,6 +129,7 @@ public class RoadNameKoreanServiceImpl implements RoadNameKoreanService, BaseCRU
 	}
 	
 	
+	
 	// 가나다순 정렬 유틸
 	private static Comparator<String> STRING_ASC = Comparator.nullsLast(String::compareToIgnoreCase);
 	// 시 할당 없는 세종시를 위한 시군수 매핑을 위한 고정 값
@@ -150,55 +180,33 @@ public class RoadNameKoreanServiceImpl implements RoadNameKoreanService, BaseCRU
 	
 	@Override
 	public List<String> searchProvinces(String query, int limit) {
-		return repository
-				       .findDistinct시도명By시도명Containing(query.trim(),
-						       PageRequest.of(0, 1000))
-				       .stream()
-				       .map(Road도로명주소한글::get시도명)  // 여기서 필드 추출
-				       .filter(Objects::nonNull)
-				       .collect(Collectors.toList());
+		String q = query.trim();
+		return provinces.stream()
+				       .filter(s -> s.contains(q))
+				       .limit(limit)
+				       .toList();
 	}
 	
 	@Override
 	public List<String> searchCities(String query, int limit) {
-		return repository
-				       .findDistinct시군구명By시군구명Containing(query.trim(),
-						       PageRequest.of(0, 1000))
-				       .stream()
-				       .map(Road도로명주소한글::get시군구명)  // 여기서 필드 추출
-				       .map(s -> s == null ? "세종특별자치시" : s) // 세종 예외 처리
-				       .filter(Objects::nonNull)
-				       .collect(Collectors.toList());
+		String q = query.trim();
+		return cities.stream()
+				       .filter(s -> s.contains(q))
+				       .limit(limit)
+				       .toList();
 	}
 	
 	@Override
 	public List<String> searchTowns(String query, int limit) {
 		String q = query.trim();
 		
-		List<Road도로명주소한글> 읍면동 = repository
-				                   .findDistinct법정읍면동명By법정읍면동명Containing(q, PageRequest.of(0, 10000));
-		
-		List<Road도로명주소한글> 리 = repository
-				                 .findDistinct법정리명By법정리명Containing(q, PageRequest.of(0, 10000));
-		
-		List<String> String읍면동 = 읍면동.stream().map(Road도로명주소한글::get법정읍면동명).collect(Collectors.toList());
-		List<String> String리 = 리.stream().map(Road도로명주소한글::get법정리명).collect(Collectors.toList());
-		
-		List<String> result = new ArrayList<>();
-		
-		// 읍면동 단독
-		result.addAll(String읍면동);
-		
-		// 리 조합
-		result.addAll(String리);
-		
-		return result.stream()
-				       .distinct()
+		return towns.stream()
+				       .filter(s -> s.contains(q))
 				       .sorted(
 						       Comparator
-								       .comparing((String s) -> !s.startsWith(query))   // startsWith 우선
-								       .thenComparing(s -> !s.contains(query))         // contains 우선
-								       .thenComparing(String.CASE_INSENSITIVE_ORDER)   // fallback 사전순
+								       .comparing((String s) -> !s.startsWith(q))
+								       .thenComparing(s -> !s.contains(q))
+								       .thenComparing(String::compareToIgnoreCase)
 				       )
 				       .limit(limit)
 				       .toList();

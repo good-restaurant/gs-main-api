@@ -239,4 +239,59 @@ public class RestaurantServiceV3Impl implements RestaurantServiceV3, BaseCRUD<Re
 		// ## 순서 보존 + 중복 제거된 결과
 		return new ArrayList<>(map.values());
 	}
+	
+	@Override
+	public List<Restaurant> getAddressRestaurants(String province, String city, String town) {
+		
+		// 문자열 공백 방지
+		String normalizedProvince = normalize(province);
+		String normalizedCity = normalize(city);
+		String normalizedTown = normalize(town);
+		
+		// 읍 면 동 전용
+		if (normalizedTown != null && (normalizedProvince == null && normalizedCity == null)) {
+			List<Restaurant> restaurantList = repository.findByEmdKorNm(normalizedTown);
+			if (!restaurantList.isEmpty()) return restaurantList;
+		}
+		
+		// 읍 면 동 + 시
+		if (normalizedTown != null && normalizedCity != null && normalizedProvince == null) {
+			List<Restaurant> restaurantList = repository.findByEmdKorNmAndSigKorNm(normalizedTown, normalizedCity);
+			if (!restaurantList.isEmpty()) return restaurantList;
+		}
+		
+		// 시 전용
+		if (normalizedCity != null && (normalizedProvince == null && normalizedTown == null)) {
+			List<Restaurant> restaurantList = repository.findBySigKorNm(normalizedCity);
+			if (!restaurantList.isEmpty()) return restaurantList;
+		}
+		
+		// 완전 일치
+		if (normalizedProvince != null && normalizedCity != null && normalizedTown != null) {
+			List<Restaurant> restaurantList = repository.findByCtpKorNmAndSigKorNmAndEmdKorNm(normalizedProvince, normalizedCity, normalizedTown);
+			if (!restaurantList.isEmpty()) return restaurantList;
+		}
+		
+		// 시·군·구 단위
+		if (normalizedProvince != null && normalizedCity != null) {
+			List<Restaurant> restaurantList = repository.findByCtpKorNmAndSigKorNm(normalizedProvince, normalizedCity);
+			if (!restaurantList.isEmpty()) return restaurantList;
+		}
+		
+		// 도 단위
+		if (normalizedProvince != null) {
+			List<Restaurant> restaurantList = repository.findByCtpKorNm(normalizedProvince);
+			if (!restaurantList.isEmpty()) return restaurantList;
+		}
+		
+		// 아무것도 없으면 랜덤 1000개
+		return randomLimit(1000);
+	}
+	
+	private String normalize(String s) {
+		if (s == null) return null;
+		s = s.trim();
+		return s.isBlank() ? null : s;
+	}
+	
 }

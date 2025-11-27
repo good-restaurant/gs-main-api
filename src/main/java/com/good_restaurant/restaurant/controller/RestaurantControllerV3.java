@@ -9,6 +9,7 @@ import com.good_restaurant.restaurant.service.RestaurantServiceV3;
 import com.good_restaurant.restaurant.service.RoadNameKoreanService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.Nullable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,7 +41,7 @@ public class RestaurantControllerV3 {
 	}
 	
 	/**
-	 * 전체 음식점 좌표를 랜덤으로 조회합니다.
+	 *
 	 *
 	 * @param limit 조회할 음식점 좌표 개수(기본값: 100)
 	 * @return 음식점 좌표 리스트
@@ -192,5 +193,28 @@ public class RestaurantControllerV3 {
 		List<Restaurant> filteredRestaurantByLimit = serviceV3.limitFilter(limit, restaurantList);
 		
 		return ResponseEntity.ok(mapper.toFullDto(filteredRestaurantByLimit));
+	}
+	
+	
+	/**
+	 * 행정동 기반으로 주변 음식점 목록을 조회합니다.
+	 *
+	 * @param province 도, 자치시도
+	 * @param city 시 군 구
+	 * @param town 동 읍 면 리
+	 * @param limit 개수제한 (기본 100)
+	 * @return 주변 음식점 리스트
+	 */
+	@GetMapping("/address")
+	public ResponseEntity<List<RestaurantDetailResDto>> findRestaurantsByAddress(
+			@Nullable @RequestParam(required = false) String province,
+			@Nullable @RequestParam(required = false) String city,
+			@Nullable @RequestParam(required = false) String town,
+			@RequestParam(defaultValue = "100") Integer limit
+) {
+		List<Restaurant> restaurantList = serviceV3.getAddressRestaurants(province, city, town);
+		List<Restaurant> filteredRestaurantByLimit = serviceV3.limitFilter(limit, restaurantList);
+		
+		return ResponseEntity.ok(mapper.toDetailResDto(filteredRestaurantByLimit));
 	}
 }

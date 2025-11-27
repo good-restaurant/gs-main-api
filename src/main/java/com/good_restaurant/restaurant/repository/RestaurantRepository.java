@@ -93,4 +93,16 @@ public interface RestaurantRepository extends JpaRepository<Restaurant, Long>, R
 	List<Restaurant> findByRestaurantNameContainingIgnoreCase(@Nullable String restaurantName);
 	
 	List<Restaurant> findByAddressContainingIgnoreCase(String onlyNum);
+	
+	List<Restaurant> findByCtpKorNmAndSigKorNmAndEmdKorNm(String province, String city, String town);
+	
+	List<Restaurant> findByCtpKorNmAndSigKorNm(String province, String city);
+	
+	List<Restaurant> findByCtpKorNm(String province);
+	
+	List<Restaurant> findByEmdKorNm(String t);
+	
+	List<Restaurant> findByEmdKorNmAndSigKorNm(String emdKorNm, String sigKorNm);
+	
+	List<Restaurant> findBySigKorNm(String sigKorNm);
 }
