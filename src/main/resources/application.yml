@@ -49,3 +49,9 @@ logging:
 
   include:
     - http
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://sso.i4624.info/realms/i4624sso

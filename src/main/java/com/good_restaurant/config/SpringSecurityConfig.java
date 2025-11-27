@@ -26,8 +26,14 @@ public class SpringSecurityConfig {
 	    http
 	            .csrf(csrf -> csrf.disable()) // csrf 해제
 	            .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/admin/**").hasRole("admin")   // admin role 필요
 	                    .anyRequest().permitAll() // Allow all requests without authentication
 	            )
+			    .oauth2ResourceServer(
+						oauth2 -> oauth2.jwt(
+								jwtConfigurer -> jwtConfigurer.jwtAuthenticationConverter(new JwtAuthConverter())
+						)
+			    )
 	            .formLogin(login -> login.disable()) // Disable form login
 	            .httpBasic(basic -> basic.disable()) // Disable HTTP Basic authentication
 	            .logout(logout -> logout.disable()) // Disable logout
@@ -55,7 +61,4 @@ public class SpringSecurityConfig {
 	
 	    return http.build();
     }
-	
-
-
 }
