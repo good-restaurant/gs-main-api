@@ -6,6 +6,7 @@ import com.good_restaurant.restaurant.service.A_Exception.MergePropertyException
 import com.good_restaurant.restaurant.service.A_base.BaseCRUD;
 import com.good_restaurant.restaurant.service.A_base.ServiceHelper;
 import com.good_restaurant.restaurant.service.RoadNameKoreanService;
+import com.querydsl.core.Tuple;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -13,7 +14,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -95,4 +98,110 @@ public class RoadNameKoreanServiceImpl implements RoadNameKoreanService, BaseCRU
 		
 		return sb.toString().trim();
 	}
+	
+	
+	// 가나다순 정렬 유틸
+	private static Comparator<String> STRING_ASC = Comparator.nullsLast(String::compareToIgnoreCase);
+	// 시 할당 없는 세종시를 위한 시군수 매핑을 위한 고정 값
+	private static final String SEJONG = "세종특별자치시";
+	
+	@Override
+	public List<String> getProvinceList() {
+		return repository.findAllDistinctBy시도명().stream()
+				       .sorted(STRING_ASC)
+				       .collect(Collectors.toList());
+	}
+	
+	@Override
+	public List<String> getCityList() {
+		return repository.findAllDistinctBy시군구명().stream()
+						// null 주소 세종시에 할당하여 FE에 전달
+						// BE에서 세종을 전달하면 null 케이스를 해석해야 하는 문제 보유
+				       .map(s -> s == null || s.isBlank() ? SEJONG : s)
+				       .sorted(STRING_ASC)
+				       .collect(Collectors.toList());
+	}
+	
+	@Override
+	public List<String> getTownList() {
+		List<Tuple> rows = repository.findAllDistinctBy법정읍면동리명();
+		
+		List<String> result = new ArrayList<>();
+		
+		for (Tuple t : rows) {
+			String 읍면동 = t.get(0, String.class);
+			String 리 = t.get(1, String.class);
+			
+			if (리 == null || 리.isBlank()) {
+				// 리가 없는 경우: 읍면동 단독
+				result.add(읍면동);
+			} else {
+				// 리가 있는 경우: 읍면동 + 리
+				result.add(리);
+			}
+		}
+		
+		return result.stream()
+				       .distinct()
+				       .sorted(String::compareToIgnoreCase)
+				       .collect(Collectors.toList());
+	}
+	
+	
+	@Override
+	public List<String> searchProvinces(String query, int limit) {
+		return repository
+				       .findDistinct시도명By시도명Containing(query.trim(),
+						       PageRequest.of(0, 1000))
+				       .stream()
+				       .map(Road도로명주소한글::get시도명)  // 여기서 필드 추출
+				       .filter(Objects::nonNull)
+				       .collect(Collectors.toList());
+	}
+	
+	@Override
+	public List<String> searchCities(String query, int limit) {
+		return repository
+				       .findDistinct시군구명By시군구명Containing(query.trim(),
+						       PageRequest.of(0, 1000))
+				       .stream()
+				       .map(Road도로명주소한글::get시군구명)  // 여기서 필드 추출
+				       .map(s -> s == null ? "세종특별자치시" : s) // 세종 예외 처리
+				       .filter(Objects::nonNull)
+				       .collect(Collectors.toList());
+	}
+	
+	@Override
+	public List<String> searchTowns(String query, int limit) {
+		String q = query.trim();
+		
+		List<Road도로명주소한글> 읍면동 = repository
+				                   .findDistinct법정읍면동명By법정읍면동명Containing(q, PageRequest.of(0, 10000));
+		
+		List<Road도로명주소한글> 리 = repository
+				                 .findDistinct법정리명By법정리명Containing(q, PageRequest.of(0, 10000));
+		
+		List<String> String읍면동 = 읍면동.stream().map(Road도로명주소한글::get법정읍면동명).collect(Collectors.toList());
+		List<String> String리 = 리.stream().map(Road도로명주소한글::get법정리명).collect(Collectors.toList());
+		
+		List<String> result = new ArrayList<>();
+		
+		// 읍면동 단독
+		result.addAll(String읍면동);
+		
+		// 리 조합
+		result.addAll(String리);
+		
+		return result.stream()
+				       .distinct()
+				       .sorted(
+						       Comparator
+								       .comparing((String s) -> !s.startsWith(query))   // startsWith 우선
+								       .thenComparing(s -> !s.contains(query))         // contains 우선
+								       .thenComparing(String.CASE_INSENSITIVE_ORDER)   // fallback 사전순
+				       )
+				       .limit(limit)
+				       .toList();
+	}
+	
 }
