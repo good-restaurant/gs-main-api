@@ -26,7 +26,7 @@ public class SpringSecurityConfig {
 	    http
 	            .csrf(csrf -> csrf.disable()) // csrf 해제
 	            .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/admin/**").hasRole("admin")   // admin role 필요
+                        .requestMatchers("/v1/restaurant-admin/**").hasRole("admin")   // admin role 필요
 	                    .anyRequest().permitAll() // Allow all requests without authentication
 	            )
 			    .oauth2ResourceServer(
