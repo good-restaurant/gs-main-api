@@ -194,9 +194,14 @@ public class RoadNameKoreanServiceImpl implements RoadNameKoreanService, BaseCRU
 		
 		return result.stream()
 				       .distinct()
-				       .sorted(String.CASE_INSENSITIVE_ORDER)
+				       .sorted(
+						       Comparator
+								       .comparing((String s) -> !s.startsWith(query))   // startsWith 우선
+								       .thenComparing(s -> !s.contains(query))         // contains 우선
+								       .thenComparing(String.CASE_INSENSITIVE_ORDER)   // fallback 사전순
+				       )
 				       .limit(limit)
-				       .collect(Collectors.toList());
+				       .toList();
 	}
 	
 }
