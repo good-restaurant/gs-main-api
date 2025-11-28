@@ -6,6 +6,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 
@@ -15,25 +17,25 @@ import java.util.Arrays;
 @EnableWebSecurity
 public class SpringSecurityConfig {
 	
-	private final PasswordEncoder passwordEncoder;
-	
-	public SpringSecurityConfig() {
-		this.passwordEncoder = new BCryptPasswordEncoder();
-	}
-	
+//	// private final PasswordEncoder passwordEncoder;
+//
+//	// public SpringSecurityConfig() {
+//		this.passwordEncoder = new BCryptPasswordEncoder();
+//	}
+//
 	@Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 	    http
 	            .csrf(csrf -> csrf.disable()) // csrf 해제
+			    .oauth2ResourceServer(
+					    oauth2 -> oauth2.jwt(
+							    jwtConfigurer -> jwtConfigurer.jwtAuthenticationConverter(new JwtAuthConverter())
+					    )
+			    )
 	            .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/v1/restaurant-admin/**").hasRole("admin")   // admin role 필요
 	                    .anyRequest().permitAll() // Allow all requests without authentication
 	            )
-			    .oauth2ResourceServer(
-						oauth2 -> oauth2.jwt(
-								jwtConfigurer -> jwtConfigurer.jwtAuthenticationConverter(new JwtAuthConverter())
-						)
-			    )
 	            .formLogin(login -> login.disable()) // Disable form login
 	            .httpBasic(basic -> basic.disable()) // Disable HTTP Basic authentication
 	            .logout(logout -> logout.disable()) // Disable logout
@@ -61,4 +63,5 @@ public class SpringSecurityConfig {
 	
 	    return http.build();
     }
+
 }
