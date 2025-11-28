@@ -54,7 +54,14 @@ public class SpringSecurityConfig {
 			                        "http://gs-main-api.i4624.info"
 	                        )); // Update with your client's origins
 		                    configuration.addAllowedOriginPattern("https://*.i4624.info");
-	                        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+	                        configuration.setAllowedMethods(Arrays.asList(
+			                        "GET",
+			                        "POST",
+			                        "PUT",
+			                        "DELETE",
+			                        "OPTIONS",
+			                        "PATCH"
+	                        ));
 	                        configuration.setAllowedHeaders(Arrays.asList("*"));
 	                        configuration.setAllowCredentials(true); // Allow credentials if needed
 		                    
