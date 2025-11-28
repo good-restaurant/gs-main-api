@@ -9,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 
 import java.util.Arrays;
@@ -24,7 +25,7 @@ public class SpringSecurityConfig {
 //	}
 //
 	@Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, ServiceUserSyncFilter serviceUserSyncFilter) throws Exception {
 	    http
 	            .csrf(csrf -> csrf.disable()) // csrf 해제
 			    .oauth2ResourceServer(
@@ -36,6 +37,7 @@ public class SpringSecurityConfig {
                         .requestMatchers("/v1/restaurant-admin/**").hasRole("admin")   // admin role 필요
 	                    .anyRequest().permitAll() // Allow all requests without authentication
 	            )
+			    .addFilterAfter(serviceUserSyncFilter, UsernamePasswordAuthenticationFilter.class)
 	            .formLogin(login -> login.disable()) // Disable form login
 	            .httpBasic(basic -> basic.disable()) // Disable HTTP Basic authentication
 	            .logout(logout -> logout.disable()) // Disable logout
