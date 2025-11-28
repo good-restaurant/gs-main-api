@@ -19,7 +19,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-@Table(name = "restaurants", schema = "good_restaurant")
+@Table(name = "ServiceUser", schema = "good_restaurant")
 public class ServiceUser {
 	@Id
 	@Column(name = "userId", nullable = false)
@@ -39,14 +39,41 @@ public class ServiceUser {
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<UserRole> roles = new HashSet<>();
 	
-	public void addRole(UserRole role) {
-		roles.add(role);
-		// 양방향 관계 설정
-		role.user = this;
+	public void addRole(String roleName) {
+		boolean exists = this.roles.stream()
+				                 .anyMatch(r -> r.getRole().equals(roleName));
+		
+		if (exists) return;
+		
+		UserRole newRole = UserRole.builder()
+				                   .role(roleName)
+				                   .user(this)
+				                   .build();
+		
+		this.roles.add(newRole);
 	}
 	
 	public void removeRole(UserRole role) {
 		roles.remove(role);
 		role.user = null;
+	}
+	
+	public void addRole(UserRole userRole) {
+		roles.add(userRole);
+		userRole.user = this;
+	}
+	
+	public void removeRole(String roleName) {
+		boolean exists = this.roles.stream()
+				                 .anyMatch(r -> r.getRole().equals(roleName));
+		
+		if (exists) return;
+		
+		UserRole changedRole = UserRole.builder()
+				                   .role(roleName)
+				                   .user(this)
+				                   .build();
+		
+		this.roles.remove(changedRole);
 	}
 }

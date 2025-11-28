@@ -14,7 +14,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "restaurants", schema = "good_restaurant")
+@Table(name = "UserRole", schema = "good_restaurant")
 public class UserRole {
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
