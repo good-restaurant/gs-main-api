@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('GoodService_ADMIN')")
+@PreAuthorize("isAuthenticated()")
 @RequestMapping("/v1/restaurant-admin")
 public class RestaurantAdminController {
 	
