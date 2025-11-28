@@ -12,6 +12,7 @@ import com.good_restaurant.restaurant.service.UserRoleService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ServiceUserServiceImpl implements ServiceUserService, BaseCRUD<ServiceUser, UUID> {
 
 	private final ServiceUserRepository repository;
@@ -75,7 +77,7 @@ public class ServiceUserServiceImpl implements ServiceUserService, BaseCRUD<Serv
 		String name = jwt.getClaim("name");
 		
 		// roles 추출
-		Set<String> roles = jwtUtilities.extractRoles(jwt);
+		Set<String> roles = jwtUtilities.extractServiceRoles(jwt);
 		
 		// 기존 유저 조회
 		ServiceUser user = repository.findById(sub)
