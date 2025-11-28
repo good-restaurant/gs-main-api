@@ -1,16 +1,19 @@
 package com.good_restaurant.restaurant.service.impl;
 
+import com.good_restaurant.restaurant.domain.ServiceUser;
 import com.good_restaurant.restaurant.domain.UserRole;
 import com.good_restaurant.restaurant.repository.UserRoleRepository;
 import com.good_restaurant.restaurant.service.A_Exception.MergePropertyException;
 import com.good_restaurant.restaurant.service.A_base.BaseCRUD;
 import com.good_restaurant.restaurant.service.A_base.ServiceHelper;
 import com.good_restaurant.restaurant.service.UserRoleService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -53,5 +56,39 @@ public class UserRoleServiceImpl implements UserRoleService, BaseCRUD<UserRole, 
 	@Override
 	public UUID getEntityId(UserRole entity) {
 		return entity.getId();
+	}
+	
+	@Override
+	@Transactional
+	public UserRole addRole(ServiceUser user, String roleName) {
+		
+		user.addRole(roleName);
+		
+		// 변경사항 User 쪽 cascade ALL → 자동 반영됨
+		// 또는 역할만 저장하고 싶으면 repository.save()
+		return user.getRoles().stream()
+				       .filter(r -> r.getRole().equals(roleName))
+				       .findFirst()
+				       .orElseThrow();
+	}
+	
+	@Override
+	@Transactional
+	public UserRole removeRole(ServiceUser user, String roleName) {
+		
+		UserRole roleEntity = user.getRoles().stream()
+				                      .filter(r -> r.getRole().equals(roleName))
+				                      .findFirst()
+				                      .orElse(null);
+		
+		if (roleEntity == null) {
+			// 삭제할 역할이 없으면 null 또는 예외
+			return null;
+		}
+		
+		user.removeRole(roleEntity);
+		
+		// orphanRemoval=true
+		return roleEntity;
 	}
 }
