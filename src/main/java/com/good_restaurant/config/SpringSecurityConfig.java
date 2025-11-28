@@ -8,7 +8,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 
 import java.util.Arrays;
@@ -24,7 +26,7 @@ public class SpringSecurityConfig {
 //	}
 //
 	@Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, ServiceUserSyncFilter serviceUserSyncFilter) throws Exception {
 	    http
 	            .csrf(csrf -> csrf.disable()) // csrf 해제
 			    .oauth2ResourceServer(
@@ -33,9 +35,11 @@ public class SpringSecurityConfig {
 					    )
 			    )
 	            .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/v1/restaurant-admin/**").hasRole("admin")   // admin role 필요
+//                               .requestMatchers("/v3/**").authenticated()  // 테스트용 v3 인증요구
+                               .requestMatchers("/v1/restaurant-admin/**").hasRole("GoodService_ADMIN")   // admin role 필요
 	                    .anyRequest().permitAll() // Allow all requests without authentication
 	            )
+			    .addFilterAfter(serviceUserSyncFilter, BearerTokenAuthenticationFilter.class)
 	            .formLogin(login -> login.disable()) // Disable form login
 	            .httpBasic(basic -> basic.disable()) // Disable HTTP Basic authentication
 	            .logout(logout -> logout.disable()) // Disable logout
@@ -52,7 +56,14 @@ public class SpringSecurityConfig {
 			                        "http://gs-main-api.i4624.info"
 	                        )); // Update with your client's origins
 		                    configuration.addAllowedOriginPattern("https://*.i4624.info");
-	                        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+	                        configuration.setAllowedMethods(Arrays.asList(
+			                        "GET",
+			                        "POST",
+			                        "PUT",
+			                        "DELETE",
+			                        "OPTIONS",
+			                        "PATCH"
+	                        ));
 	                        configuration.setAllowedHeaders(Arrays.asList("*"));
 	                        configuration.setAllowCredentials(true); // Allow credentials if needed
 		                    

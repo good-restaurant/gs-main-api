@@ -7,9 +7,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class JwtAuthConverter implements Converter<Jwt, AbstractAuthenticationToken> {
@@ -19,14 +17,28 @@ public class JwtAuthConverter implements Converter<Jwt, AbstractAuthenticationTo
 	@Override
 	public AbstractAuthenticationToken convert(Jwt jwt) {
 		
-		// Keycloak의 realm roles 추출
-		Collection<String> roles = jwt.getClaimAsMap(REALM_ACCESS) != null
-				                           ? (Collection<String>) ((Map<?, ?>) jwt.getClaim(REALM_ACCESS)).get(ROLES)
-				                           : Collections.emptyList();
+		Set<String> roles = new HashSet<>();
 		
-		// ROLE_ prefix 로 변환
+		// 1. Realm roles
+		Map<String, Object> realmAccess = jwt.getClaimAsMap("realm_access");
+		if (realmAccess != null) {
+			List<String> realmRoles = (List<String>) realmAccess.get("roles");
+			roles.addAll(realmRoles);
+		}
+		
+		// 2. Client roles -> 서비스용 Role 확인
+		Map<String, Object> resourceAccess = jwt.getClaimAsMap("resource_access");
+		if (resourceAccess != null) {
+			resourceAccess.forEach((client, accessObj) -> {
+				Map<String, Object> access = (Map<String, Object>) accessObj;
+				List<String> clientRoles = (List<String>) access.get("roles");
+				if (clientRoles != null) roles.addAll(clientRoles);
+			});
+		}
+		
+		// ROLE_ prefix 붙여서 Spring Security 권한 객체로 변환
 		Collection<GrantedAuthority> authorities = roles.stream()
-				                                           .map(role -> "ROLE_" + role)
+				                                           .map(r -> "ROLE_" + r)
 				                                           .map(SimpleGrantedAuthority::new)
 				                                           .collect(Collectors.toSet());
 		
