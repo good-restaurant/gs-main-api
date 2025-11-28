@@ -8,6 +8,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -34,10 +35,11 @@ public class SpringSecurityConfig {
 					    )
 			    )
 	            .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/v1/restaurant-admin/**").hasRole("admin")   // admin role 필요
+//                               .requestMatchers("/v3/**").authenticated()  // 테스트용 v3 인증요구
+                               .requestMatchers("/v1/restaurant-admin/**").hasRole("GoodService_ADMIN")   // admin role 필요
 	                    .anyRequest().permitAll() // Allow all requests without authentication
 	            )
-			    .addFilterAfter(serviceUserSyncFilter, UsernamePasswordAuthenticationFilter.class)
+			    .addFilterAfter(serviceUserSyncFilter, BearerTokenAuthenticationFilter.class)
 	            .formLogin(login -> login.disable()) // Disable form login
 	            .httpBasic(basic -> basic.disable()) // Disable HTTP Basic authentication
 	            .logout(logout -> logout.disable()) // Disable logout
