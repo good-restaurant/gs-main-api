@@ -17,11 +17,18 @@ spring:
         format_sql: true
         show_sql: true
         default_batch_fetch_size: 1000
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://sso.i4624.info/realms/i4624sso
   servlet:
 # multipart MAX size is 500 MB, but CF-max-upload is 100MB
     multipart:
       max-file-size: 500MB
       max-request-size: 500MB
+
+
 
 server:
   forward-headers-strategy: framework   # for https behind a proxy
@@ -34,7 +41,6 @@ naver:
     client-id: ${NAVER_GEOCODE_CLIENT_ID}
     client-secret: ${NAVER_GEOCODE_CLIENT_SECRET}
 
-
 s3object:
   object-server-url: "https://s3api.i4624.info"
 
@@ -46,6 +52,8 @@ logging:
     org.apache.http: DEBUG            ## Apache HttpClient 기반이면
     okhttp3: DEBUG                    ## OkHttp 기반이면 (Spring Cloud/OpenFeign 등)
     com.good_restaurant: DEBUG         ## 내 패키지
+    org.springframework.security: DEBUG
+    org.springframework.security.oauth2: DEBUG
 
   include:
     - http
