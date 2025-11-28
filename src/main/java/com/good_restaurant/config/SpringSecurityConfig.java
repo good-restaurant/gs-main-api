@@ -36,7 +36,7 @@ public class SpringSecurityConfig {
 			    )
 	            .authorizeHttpRequests(auth -> auth
 //                               .requestMatchers("/v3/**").authenticated()  // 테스트용 v3 인증요구
-                               .requestMatchers("/v1/restaurant-admin/**").hasRole("GoodService_ADMIN")   // admin role 필요
+                               .requestMatchers("/v1/restaurant-admin/**").authenticated()   // admin role 필요
 	                    .anyRequest().permitAll() // Allow all requests without authentication
 	            )
 			    .addFilterAfter(serviceUserSyncFilter, BearerTokenAuthenticationFilter.class)
