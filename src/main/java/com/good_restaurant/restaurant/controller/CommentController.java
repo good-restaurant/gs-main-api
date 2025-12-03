@@ -90,20 +90,5 @@ public class CommentController {
 		return ResponseEntity.ok(mapper.toFullDto(saved));
 	}
 	
-//	@PutMapping("/{id}")
-//	public ResponseEntity<RestaurantCommentFullDto> updateComment(
-//			@PathVariable Long id,
-//			@RequestBody RestaurantCommentFullDto dto
-//	) {
-//		RestaurantComment entity = mapper.toEntity(dto);
-//		RestaurantComment updated = service.updateComment(id, entity);
-//
-//		return ResponseEntity.ok(mapper.toFullDto(updated));
-//	}
-	
-//	@DeleteMapping("/{id}")
-//	public ResponseEntity<RestaurantCommentFullDto> deleteComment(@PathVariable Long id) {
-//		RestaurantComment comment = service.delete(id);
-//		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(mapper.toFullDto(comment));
-//	}
+	// AdminController에서만 수정 및 삭제가능
 }
