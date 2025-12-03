@@ -55,10 +55,7 @@ public class RestaurantCommentServiceImpl implements RestaurantCommentService, B
 		Pageable sorted = PageRequest.of(
 				pageable.getPageNumber(),
 				pageable.getPageSize(),
-				Sort.by(
-						Sort.Order.desc("timeRecord.updatedAt") // 최근 갱신
-								.nullsLast() // null 은 맨 마지막에
-				)
+				Sort.by(Sort.Direction.DESC, "timeRecord.updatedAt")
 		);
 		
 		return repository.findAll(sorted);
