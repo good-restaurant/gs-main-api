@@ -87,8 +87,8 @@ public class RestaurantAdminController {
 	@DeleteMapping("/{id}")
 	public ResponseEntity<RestaurantFullDto> deleteRestaurant(@PathVariable Long id) {
 		Restaurant deleted = service.delete(id);
-		return ResponseEntity.status(HttpStatus.NO_CONTENT)
-				       .body(mapper.toFullDto(deleted));
+		// 보안 취약점 취급해서 delete body 전달하는것 제거
+		return ResponseEntity.noContent().build();
 	}
 	
 	//<editor-fold desc="사진 수정 삭제">
@@ -150,7 +150,7 @@ public class RestaurantAdminController {
 	@DeleteMapping("/comment/{commentId}")
 	public ResponseEntity<RestaurantCommentFullDto> deleteComment(@PathVariable Long commentId) {
 		RestaurantComment deleted = commentService.delete(commentId);
-		return ResponseEntity.ok(commentMapper.toFullDto(deleted));
+		return ResponseEntity.noContent().build();
 	}
 	//</editor-fold>
 }
