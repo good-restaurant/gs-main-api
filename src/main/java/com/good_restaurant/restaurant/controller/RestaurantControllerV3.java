@@ -153,6 +153,7 @@ public class RestaurantControllerV3 {
 	public ResponseEntity<RestaurantDto> updateRestaurantData(@RequestBody RestaurantDto dto) throws MergePropertyException {
 		Restaurant entity = mapper.toEntity(dto);
 		RestaurantDto updateRestaurant = mapper.toDto(serviceV3.update(entity, dto.id()));
+		//noinspection TaintConfigAnnotator
 		return ResponseEntity.accepted().body(updateRestaurant);
 	}
 

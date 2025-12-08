@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Size;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 /**
  * DTO for {@link RestaurantComment}
@@ -17,7 +17,8 @@ public record RestaurantCommentFullDto(
 		@Size(max = 50) String displayName,
 		@NotNull String content,
 		BigDecimal rating,
-		Instant createdAt,
+		LocalDateTime createdAt,
+		LocalDateTime updatedAt,
 		RestaurantIdDto restaurant
 ) implements Serializable {
 }

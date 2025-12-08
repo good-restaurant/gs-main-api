@@ -1,19 +1,21 @@
 package com.good_restaurant.restaurant.domain;
 
+import com.good_restaurant.restaurant.domain.Record.TimeRecord;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
-import java.time.Instant;
 
 @Getter
 @Builder(toBuilder = true)
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 @Table(name = "restaurant_comment", schema = "good_restaurant")
 public class RestaurantComment {
 	@Id
@@ -36,9 +38,9 @@ public class RestaurantComment {
 	@Column(name = "rating", precision = 2, scale = 1)
 	private BigDecimal rating;
 	
-	@ColumnDefault("now()")
-	@Column(name = "created_at")
-	private Instant createdAt;
+	@Builder.Default
+	@Embedded
+	private TimeRecord timeRecord = new TimeRecord();  // 기본값
 	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "restaurant_id")

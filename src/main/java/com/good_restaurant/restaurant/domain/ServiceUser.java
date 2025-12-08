@@ -31,7 +31,7 @@ public class ServiceUser {
 	
 	@Builder.Default
 	@Embedded
-	private TimeRecord timeRecord = new TimeRecord();  // ★ 기본값
+	private TimeRecord timeRecord = new TimeRecord();  // 기본값
 	
 	private LocalDateTime lastLogin;
 	
