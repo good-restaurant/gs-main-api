@@ -54,8 +54,6 @@ public class SignedUrlUploadServiceImpl implements SignedUrlUploadService {
 			}
 			
 			String objectKey = (String) response.getBody().get("objectKey");
-			String normalizedObjectKey = Normalizer.normalize(originalFilename, Normalizer.Form.NFC);
-			String encodedObjectKey = URLEncoder.encode(normalizedObjectKey, StandardCharsets.UTF_8);
 			String uploadUrl = (String) response.getBody().get("url");
 			UUID uuid = UUID.fromString(objectKey.split("_")[0]);
 			
@@ -71,7 +69,7 @@ public class SignedUrlUploadServiceImpl implements SignedUrlUploadService {
 				throw new IllegalStateException("Ceph upload failed");
 			}
 			
-			return new UploadResult(uuid, encodedObjectKey, uploadUrl);
+			return new UploadResult(uuid, objectKey, uploadUrl);
 			
 		} catch (Exception e) {
 			throw new RuntimeException("Upload failed: " + e.getMessage(), e);
