@@ -69,7 +69,14 @@ public class RestaurantCommentServiceImpl implements RestaurantCommentService, B
 	// 특정 식당의 코멘트 목록 (Pageable)
 	@Override
 	public List<RestaurantComment> getCommentsByRestaurantId(Long restaurantId, Pageable pageable) {
-		return repository.findByRestaurant_Id(restaurantId, pageable).getContent();
+		Pageable sorted = PageRequest.of(
+				pageable.getPageNumber(),
+				pageable.getPageSize(),
+				Sort.by(Sort.Direction.DESC, "timeRecord.updatedAt")
+		);
+		
+		
+		return repository.findByRestaurant_Id(restaurantId, sorted).getContent();
 	}
 	
 	// 코멘트 단일 조회
