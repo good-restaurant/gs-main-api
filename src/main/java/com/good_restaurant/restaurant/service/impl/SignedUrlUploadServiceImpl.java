@@ -12,6 +12,7 @@ import org.springframework.web.client.RestTemplate;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.text.Normalizer;
 import java.util.Map;
 import java.util.UUID;
 
@@ -28,10 +29,17 @@ public class SignedUrlUploadServiceImpl implements SignedUrlUploadService {
 	// DB는 알지 못하고 presigned URL 발급 + PUT 업로드만 수행
 	@Override
 	public UploadResult uploadResult(String originalFilename, String contentType, byte[] fileBytes) {
-		
 		try {
-			String encodedFilename = URLEncoder.encode(originalFilename, StandardCharsets.UTF_8).replace("+", "%20");
-			String encodedContentType = URLEncoder.encode(contentType, StandardCharsets.UTF_8).replace("+", "%20");
+			// macOS 파일명 조합형 한글 문제 해결
+			// 맥은 조합형 한글을 쓰기 때문에, 못알아챘음.
+			String normalizedName = Normalizer.normalize(originalFilename, Normalizer.Form.NFC);
+			String normalizedType = Normalizer.normalize(contentType, Normalizer.Form.NFC);
+			
+			// URL-safe 인코딩
+			String encodedFilename = URLEncoder.encode(normalizedName, StandardCharsets.UTF_8)
+					                         .replace("+", "%20");
+			String encodedContentType = URLEncoder.encode(normalizedType, StandardCharsets.UTF_8)
+					                            .replace("+", "%20");
 			
 			String presignUrl = storageServerUrl
 					                    + "/api/files/presign-upload-json"
@@ -49,9 +57,9 @@ public class SignedUrlUploadServiceImpl implements SignedUrlUploadService {
 			String uploadUrl = (String) response.getBody().get("url");
 			UUID uuid = UUID.fromString(objectKey.split("_")[0]);
 			
-			// 실제 PUT 업로드
 			HttpHeaders headers = new HttpHeaders();
 			headers.setContentType(MediaType.parseMediaType(contentType));
+			
 			HttpEntity<byte[]> entity = new HttpEntity<>(fileBytes, headers);
 			
 			ResponseEntity<Void> uploadResponse =
@@ -67,5 +75,6 @@ public class SignedUrlUploadServiceImpl implements SignedUrlUploadService {
 			throw new RuntimeException("Upload failed: " + e.getMessage(), e);
 		}
 	}
+	
 }
 

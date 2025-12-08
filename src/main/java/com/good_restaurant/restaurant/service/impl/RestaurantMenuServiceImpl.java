@@ -21,6 +21,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.text.Normalizer;
 import java.util.Optional;
 
 @Slf4j
@@ -59,22 +62,26 @@ public class RestaurantMenuServiceImpl implements RestaurantMenuService, BaseCRU
 	@Override
 	public RestaurantMenu uploadRestaurantPicture(RestaurantMenu restaurantMenu, MultipartFile file) {
 		
-		RestaurantMenu pictureInfo = repository.findById(restaurantMenu.getId()).orElseThrow(() -> new IllegalArgumentException("해당 메뉴가 확인되지 않습니다."));;
+		RestaurantMenu pictureInfo = repository.findById(restaurantMenu.getId())
+				                             .orElseThrow(() -> new IllegalArgumentException("해당 메뉴가 확인되지 않습니다."));
 		
+		// UploadService 내부에서 정규화 + 인코딩 + objectKey 생성 처리를 모두 수행해야 한다
 		UploadResult result = uploadService.uploadResult(
 				file.getOriginalFilename(),
 				file.getContentType(),
 				file.getBytes()
 		);
 		
-		// toBuilder 로 새로운 엔티티 생성
-		RestaurantMenu updatedPicture = pictureInfo.toBuilder()
+		// UploadResult 에서 uuid + objectKey 모두 꺼내야 함
+		RestaurantMenu updated = pictureInfo.toBuilder()
 				                         .pictureUuid(result.uuid())
+				                         .s3ObjectKey(result.objectKey())  // 반드시 저장
+				                         .originalFilename(file.getOriginalFilename()) // DB에 원본 이름은 그대로 저장
 				                         .build();
 		
-		
-		return repository.save(updatedPicture);
+		return repository.save(updated);
 	}
+	
 	
 	@Override
 	public Page<RestaurantMenu> getMenusAsPage(Pageable pageable) {

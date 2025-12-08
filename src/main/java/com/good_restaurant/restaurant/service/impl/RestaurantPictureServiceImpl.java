@@ -23,6 +23,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.text.Normalizer;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -76,11 +79,14 @@ public class RestaurantPictureServiceImpl implements RestaurantPictureService, B
 				file.getBytes()
 		);
 		
+		String normalizedObjectKey = Normalizer.normalize(result.objectKey(), Normalizer.Form.NFC);
+		String encodedObjectKey = URLEncoder.encode(normalizedObjectKey, StandardCharsets.UTF_8);
+		
 		RestaurantPicture picture = RestaurantPicture.builder()
 				                            .restaurant(Restaurant.builder().id(restaurantId).build())
 				                            .pictureUuid(UUID.fromString(result.objectKey().split("_")[0]))
 				                            .originalFilename(file.getOriginalFilename())
-				                            .s3ObjectKey(result.objectKey())
+				                            .s3ObjectKey(encodedObjectKey)
 				                            .build();
 		
 		return repository.save(picture);
