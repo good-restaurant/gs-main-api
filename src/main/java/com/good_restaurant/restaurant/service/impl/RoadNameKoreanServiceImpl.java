@@ -114,18 +114,36 @@ public class RoadNameKoreanServiceImpl implements RoadNameKoreanService, BaseCRU
 	}
 	
 	// 완성형 풀주소 조립
-	public String buildFullAddress(Road도로명주소한글 d) {
-		StringBuilder sb = new StringBuilder();
-		sb.append(d.get시도명()).append(" ");
-		sb.append(d.get시군구명()).append(" ");
-		sb.append(d.get도로명()).append(" ");
-		sb.append(d.get건물본번());
+	public String buildFullAddress(Road도로명주소한글 roadString) {
 		
-		if (d.get건물부번() != null && d.get건물부번() > 0) {
-			sb.append("-").append(d.get건물부번());
+		List<String> parts = new ArrayList<>();
+		
+		if (roadString.get시도명() != null) parts.add(roadString.get시도명());
+		
+		// 세종특별자치시는 시군구가 없으므로 읍면동명 우선 사용
+		if (roadString.get시군구명() != null) {
+			parts.add(roadString.get시군구명());
+		} else if (roadString.get법정읍면동명() != null) {
+			parts.add(roadString.get법정읍면동명());
 		}
 		
-		return sb.toString().trim();
+		if (roadString.get도로명() != null) parts.add(roadString.get도로명());
+		
+		// 본번/부번 구성
+		String main = convertNum(roadString.get건물본번());
+		String sub = convertNum(roadString.get건물부번());
+		
+		if (main != null && sub != null) {
+			parts.add(main + "-" + sub);
+		} else if (main != null) {
+			parts.add(main);
+		}
+		
+		return String.join(" ", parts);
+	}
+	
+	private String convertNum(Integer v) {
+		return v == null ? null : v.toString();
 	}
 	
 	
