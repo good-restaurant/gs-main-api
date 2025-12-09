@@ -110,8 +110,8 @@ public class RoadNameKoreanServiceImpl implements RoadNameKoreanService, BaseCRU
 				                       ));
 		
 		// 4. DTO 변환 + 정렬 (간단히 roadName 기준)
-		if (merged.isEmpty()) {
-			return null; // 또는 Optional.empty()
+		if (merged == null || merged.isEmpty()) {
+			return null;
 		}
 		return merged.get(0);
 	}
