@@ -18,6 +18,7 @@ import java.util.UUID;
 public class RestaurantMenu {
 	@Id
 	@Column(name = "id", nullable = false)
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 	
 	@Size(max = 255)
