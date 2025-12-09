@@ -1,5 +1,6 @@
 package com.good_restaurant.restaurant.service.impl;
 
+import com.good_restaurant.restaurant.domain.Restaurant;
 import com.good_restaurant.restaurant.domain.RestaurantMenu;
 import com.good_restaurant.restaurant.dto.UploadResult;
 import com.good_restaurant.restaurant.repository.RestaurantMenuRepository;
@@ -88,8 +89,9 @@ public class RestaurantMenuServiceImpl implements RestaurantMenuService, BaseCRU
 	}
 	
 	public RestaurantMenu saveMenu(RestaurantMenu menu, Long restaurantId) {
+		Restaurant menuRestaurant = Restaurant.builder().id(restaurantId).build();
 		// Dto 규칙과 매핑의 복잡함, 구조 이슈를 방지하기 위해 menuDto에는 레스토랑 정보를 미기재
-		return save(menu.toBuilder().id(restaurantId).build());
+		return save(menu.toBuilder().restaurant(menuRestaurant).build());
 	}
 	
 	@SneakyThrows
