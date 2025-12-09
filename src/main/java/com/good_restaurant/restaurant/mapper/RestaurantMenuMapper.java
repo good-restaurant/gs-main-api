@@ -6,10 +6,11 @@ import org.mapstruct.*;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING)
 public interface RestaurantMenuMapper {
-	@Mapping(source = "restaurantId", target = "restaurant.id")
+//	넣지 마세요
+//	@Mapping(source = "restaurantId", target = "restaurant.id")
 	RestaurantMenu toEntity(RestaurantMenuDto restaurantMenuDto);
 	
-	@Mapping(source = "restaurant.id", target = "restaurantId")
+//	@Mapping(source = "restaurant.id", target = "restaurantId")
 	RestaurantMenuDto toDto(RestaurantMenu restaurantMenu);
 	
 	@BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
