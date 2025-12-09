@@ -1,15 +1,10 @@
 package com.good_restaurant.restaurant.controller;
 
 
-import com.good_restaurant.restaurant.domain.Restaurant;
 import com.good_restaurant.restaurant.domain.RestaurantMenu;
-import com.good_restaurant.restaurant.dto.RestaurantFullDto;
 import com.good_restaurant.restaurant.dto.RestaurantMenuDto;
 import com.good_restaurant.restaurant.mapper.RestaurantMenuMapper;
 import com.good_restaurant.restaurant.service.RestaurantMenuService;
-import com.good_restaurant.restaurant.service.RestaurantService;
-import com.good_restaurant.restaurant.service.SignedUrlDownloadService;
-import com.good_restaurant.restaurant.service.SignedUrlUploadService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -53,13 +48,14 @@ public class RestaurantMenuController {
 	
 	/**
 	 * 메뉴 신규 생성
+	 * @param id 레스토랑의 ID (메뉴가 아님)
 	 */
-	@PostMapping
-	public ResponseEntity<RestaurantMenuDto> createMenu(
+	@PostMapping("/{id}")
+	public ResponseEntity<RestaurantMenuDto> createMenu( @PathVariable Long id,
 			@RequestBody RestaurantMenuDto dto // 생성할 메뉴 정보
 	) {
 		RestaurantMenu entity = mapper.toEntity(dto);
-		RestaurantMenu saved = service.save(entity);
+		RestaurantMenu saved = service.saveMenu(entity, id);
 		return ResponseEntity.ok(mapper.toDto(saved));
 	}
 	

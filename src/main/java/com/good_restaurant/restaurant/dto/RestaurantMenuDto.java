@@ -14,5 +14,6 @@ public record RestaurantMenuDto(
 		String description,
 		Integer price,
 		UUID pictureUuid
+//		레스토랑 id 는 순환 문제 때문에 넣지 않습니다.
 ) implements Serializable {
 }

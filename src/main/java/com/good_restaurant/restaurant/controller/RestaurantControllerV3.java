@@ -69,6 +69,10 @@ public class RestaurantControllerV3 {
 			@RequestParam(defaultValue = "0.1") Double radius,
 			@RequestParam(defaultValue = "20") Integer limit) {
 		String finalAddress = roadNameKoreanService.buildFullAddress(roadNameKoreanService.searchCandidates(address));
+		if (finalAddress.isBlank() || finalAddress.equals(" ") || finalAddress == null) {
+			return ResponseEntity.noContent().build();
+		}
+		
 		List<Restaurant> restaurantList = serviceV3.getnearRestaurants(finalAddress, radius, limit);
 		return ResponseEntity.ok(mapper.toDetailResDto(restaurantList));
 	}

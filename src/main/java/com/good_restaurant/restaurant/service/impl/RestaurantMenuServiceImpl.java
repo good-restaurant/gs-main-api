@@ -2,14 +2,12 @@ package com.good_restaurant.restaurant.service.impl;
 
 import com.good_restaurant.restaurant.domain.Restaurant;
 import com.good_restaurant.restaurant.domain.RestaurantMenu;
-import com.good_restaurant.restaurant.domain.RestaurantPicture;
 import com.good_restaurant.restaurant.dto.UploadResult;
 import com.good_restaurant.restaurant.repository.RestaurantMenuRepository;
 import com.good_restaurant.restaurant.service.A_Exception.MergePropertyException;
 import com.good_restaurant.restaurant.service.A_base.BaseCRUD;
 import com.good_restaurant.restaurant.service.A_base.ServiceHelper;
 import com.good_restaurant.restaurant.service.RestaurantMenuService;
-import com.good_restaurant.restaurant.service.RestaurantPictureService;
 import com.good_restaurant.restaurant.service.SignedUrlDownloadService;
 import com.good_restaurant.restaurant.service.SignedUrlUploadService;
 import lombok.RequiredArgsConstructor;
@@ -21,9 +19,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.text.Normalizer;
 import java.util.Optional;
 
 @Slf4j
@@ -93,9 +88,10 @@ public class RestaurantMenuServiceImpl implements RestaurantMenuService, BaseCRU
 		return repository.findById(id).orElse(null);
 	}
 	
-	@Override
-	public RestaurantMenu save(RestaurantMenu menu) {
-		return save(menu);
+	public RestaurantMenu saveMenu(RestaurantMenu menu, Long restaurantId) {
+		Restaurant menuRestaurant = Restaurant.builder().id(restaurantId).build();
+		// Dto 규칙과 매핑의 복잡함, 구조 이슈를 방지하기 위해 menuDto에는 레스토랑 정보를 미기재
+		return save(menu.toBuilder().restaurant(menuRestaurant).build());
 	}
 	
 	@SneakyThrows

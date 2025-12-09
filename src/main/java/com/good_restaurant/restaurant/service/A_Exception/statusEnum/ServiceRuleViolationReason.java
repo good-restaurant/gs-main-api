@@ -1,6 +1,9 @@
 package com.good_restaurant.restaurant.service.A_Exception.statusEnum;
 
 import org.springframework.http.HttpStatus;
+
+import java.util.MissingFormatArgumentException;
+
 public enum ServiceRuleViolationReason {
 
     DUPLICATE_ENTRY(HttpStatus.CONFLICT, "해당 데이터가 이미 존재합니다."),
@@ -30,10 +33,16 @@ public enum ServiceRuleViolationReason {
     public HttpStatus getStatus() {
         return status;
     }
-
-    public String getMessage(Object... args) {
-        // 메시지에 포맷팅을 적용하여 동적 데이터 포함, args가 없을 경우 기본 메시지만 반환
-        return String.format(message, args);
-    }
+	
+	public String getMessage(Object... args) {
+		try {
+			return args == null || args.length == 0
+					       ? message
+					       : String.format(message, args);
+		} catch (MissingFormatArgumentException e) {
+			// fallback: 포맷 실패 시 원본 메시지를 반환하도록 안전 처리
+			return message;
+		}
+	}
 }
 

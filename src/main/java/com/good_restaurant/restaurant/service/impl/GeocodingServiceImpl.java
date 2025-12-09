@@ -6,6 +6,7 @@ import com.good_restaurant.restaurant.dto.GeocodeResultDto;
 import com.good_restaurant.restaurant.service.GeocodingService;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.Duration;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,35 +32,56 @@ public class GeocodingServiceImpl implements GeocodingService {
     private static final int COORD_SCALE = 6;   // Coordinate decimal places
     private final GeocodingConfig geoConfig;
 	
-
-    @Override
-    public GeocodeResultDto geocode(String address) {
-        NaverResponse res = geoConfig.geocodingWebClient().get()
-            .uri(uriBuilder -> uriBuilder
-                .queryParam("query", address)
-                .build())
-            .retrieve()
-            .bodyToMono(NaverResponse.class)
-            .onErrorResume(e -> Mono.empty())
-            .block();
-
-        if (res == null || res.addresses == null || res.addresses.isEmpty()) {
-            log.warn("Geocoding failed for address: {}", address);
-            return null;
-        }
-
-        NaverResponse.Address ad = res.addresses.get(0);
-        BigDecimal lon = new BigDecimal(ad.x).setScale(COORD_SCALE, RoundingMode.HALF_UP);
-        BigDecimal lat = new BigDecimal(ad.y).setScale(COORD_SCALE, RoundingMode.HALF_UP);
-        return new GeocodeResultDto(lon, lat);
-    }
-
-    private static class NaverResponse {
+	
+	@Override
+	public GeocodeResultDto geocode(String address) {
+		
+		if (address == null || address.isBlank() || address.contains("null")) {
+			log.warn("Invalid address input: {}", address);
+			return null;
+		}
+		
+		NaverResponse res = geoConfig.geocodingWebClient().get()
+				                    .uri(uriBuilder -> uriBuilder
+						                                       .queryParam("query", address)
+						                                       .build())
+				                    .retrieve()
+				                    .bodyToMono(NaverResponse.class)
+				                    .timeout(Duration.ofSeconds(2))
+				                    .onErrorResume(e -> {
+					                    log.warn("Geocoding request failed: {}", e.getMessage());
+					                    return Mono.empty();
+				                    })
+				                    .block();
+		
+		if (res == null || res.addresses == null || res.addresses.isEmpty()) {
+			log.warn("Geocoding failed: no address matched for [{}]", address);
+			return null;
+		}
+		
+		// 우선순위 기반 선택
+		NaverResponse.Address ad = res.addresses.stream()
+				                           .filter(a -> a.roadAddress != null)
+				                           .findFirst()
+				                           .orElse(res.addresses.get(0));
+		
+		BigDecimal lon = new BigDecimal(ad.x).setScale(COORD_SCALE, RoundingMode.HALF_UP);
+		BigDecimal lat = new BigDecimal(ad.y).setScale(COORD_SCALE, RoundingMode.HALF_UP);
+		
+		return new GeocodeResultDto(lon, lat);
+	}
+	
+	
+	private static class NaverResponse {
         public List<Address> addresses;
         @JsonIgnoreProperties(ignoreUnknown = true)
         static class Address {
             public String x; // longitude
             public String y; // latitude
+	        public String roadAddress;
+	        public String jibunAddress;
+	        public String buildingName;
         }
     }
+	
 }
