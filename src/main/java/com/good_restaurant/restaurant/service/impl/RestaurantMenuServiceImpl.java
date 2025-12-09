@@ -87,8 +87,9 @@ public class RestaurantMenuServiceImpl implements RestaurantMenuService, BaseCRU
 		return repository.findById(id).orElse(null);
 	}
 	
-	public RestaurantMenu saveMenu(RestaurantMenu menu) {
-		return save(menu);
+	public RestaurantMenu saveMenu(RestaurantMenu menu, Long restaurantId) {
+		// Dto 규칙과 매핑의 복잡함, 구조 이슈를 방지하기 위해 menuDto에는 레스토랑 정보를 미기재
+		return save(menu.toBuilder().id(restaurantId).build());
 	}
 	
 	@SneakyThrows

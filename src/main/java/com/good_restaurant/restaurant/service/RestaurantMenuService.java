@@ -13,7 +13,7 @@ public interface RestaurantMenuService {
 	
 	RestaurantMenu findMenuById(Long id);
 	
-	RestaurantMenu saveMenu(RestaurantMenu menu);
+	RestaurantMenu saveMenu(RestaurantMenu menu, Long id);
 	
 	RestaurantMenu updateMenu(Long id, RestaurantMenu newMenu);
 	
