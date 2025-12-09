@@ -110,11 +110,15 @@ public class RoadNameKoreanServiceImpl implements RoadNameKoreanService, BaseCRU
 				                       ));
 		
 		// 4. DTO 변환 + 정렬 (간단히 roadName 기준)
-		return merged.getFirst();
+		if (merged.isEmpty()) {
+			return null; // 또는 Optional.empty()
+		}
+		return merged.get(0);
 	}
 	
 	// 완성형 풀주소 조립
 	public String buildFullAddress(Road도로명주소한글 roadString) {
+		if (roadString == null) return null;
 		
 		List<String> parts = new ArrayList<>();
 		
