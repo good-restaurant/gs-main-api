@@ -1,6 +1,7 @@
 package com.good_restaurant.restaurant.controller;
 
 import com.good_restaurant.restaurant.domain.Restaurant;
+import com.good_restaurant.restaurant.domain.Road도로명주소한글;
 import com.good_restaurant.restaurant.dto.*;
 import com.good_restaurant.restaurant.mapper.RestaurantMapper;
 import com.good_restaurant.restaurant.mapper.RoadNameKoreanMapper;
@@ -68,8 +69,16 @@ public class RestaurantControllerV3 {
 			@RequestParam String address,
 			@RequestParam(defaultValue = "0.1") Double radius,
 			@RequestParam(defaultValue = "20") Integer limit) {
-		String finalAddress = roadNameKoreanService.buildFullAddress(roadNameKoreanService.searchCandidates(address));
-		if (finalAddress.isBlank() || finalAddress.equals(" ") || finalAddress == null) {
+		
+		Road도로명주소한글 candidate = roadNameKoreanService.searchCandidates(address);
+		
+		if (candidate == null) {
+			return ResponseEntity.noContent().build();
+		}
+		
+		String finalAddress = roadNameKoreanService.buildFullAddress(candidate);
+		
+		if (finalAddress == null || finalAddress.isBlank()) {
 			return ResponseEntity.noContent().build();
 		}
 		
