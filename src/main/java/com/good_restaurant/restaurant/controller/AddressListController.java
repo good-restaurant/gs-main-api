@@ -55,7 +55,7 @@ public class AddressListController {
 	 *
 	 * @return 동/리 리스트
 	 */
-	@GetMapping("/searchlist/town/")
+	@GetMapping("/searchlist/town")
 	public ResponseEntity<List<String>> getTowns(
 			@RequestParam("city") String cityQuery
 	) {
