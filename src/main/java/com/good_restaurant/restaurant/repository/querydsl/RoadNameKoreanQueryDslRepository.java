@@ -17,4 +17,10 @@ public interface RoadNameKoreanQueryDslRepository {
 	List<Tuple> findAllDistinctBy법정읍면동리명();
 	
 	List<Tuple> findAllDistinctBy법정리명();
+
+	/**
+	 * 주어진 시군구명(세종특별자치시 포함)에 속한 법정 읍면동/리 명을 distinct 로 반환합니다.
+	 * 반환 Tuple 스키마: (법정읍면동명, 법정리명)
+	 */
+	List<Tuple> findDistinctTownByCity(String cityName);
 }

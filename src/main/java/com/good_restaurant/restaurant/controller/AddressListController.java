@@ -50,6 +50,18 @@ public class AddressListController {
 		return ResponseEntity.ok(service.getTownList());
 	}
 	
+	/**
+	 * 전체 주소의 읍면동/리 목록을 반환합니다.
+	 *
+	 * @return 동/리 리스트
+	 */
+	@GetMapping("/searchlist/town")
+	public ResponseEntity<List<String>> getTowns(
+			@RequestParam("city") String cityQuery
+	) {
+		return ResponseEntity.ok(service.getTownListByCity(cityQuery));
+	}
+	
 	
 	/**
 	 * 시도명 검색 (LIKE 기반)
