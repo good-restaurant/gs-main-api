@@ -17,4 +17,6 @@ public interface RoadNameKoreanQueryDslRepository {
 	List<Tuple> findAllDistinctBy법정읍면동리명();
 	
 	List<Tuple> findAllDistinctBy법정리명();
+	
+	List<Road도로명주소한글> findRoadNameBy도로명(String query);
 }

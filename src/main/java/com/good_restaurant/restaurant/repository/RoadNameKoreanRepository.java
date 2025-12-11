@@ -27,6 +27,7 @@ public interface RoadNameKoreanRepository extends JpaRepository<Road도로명주
 	
 	List<Road도로명주소한글> findDistinct법정리명By법정리명Containing(String keyword, Pageable pageable);
 	
+	List<Road도로명주소한글> findRoadNameBy도로명(String query);
 	
 	List<String> findAllDistinctBy시도명();
 	

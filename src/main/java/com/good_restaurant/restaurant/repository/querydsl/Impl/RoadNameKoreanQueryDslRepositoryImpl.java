@@ -80,4 +80,18 @@ public class RoadNameKoreanQueryDslRepositoryImpl implements RoadNameKoreanQuery
 				       .orderBy(road.법정리명.asc())
 				       .fetch();
 	}
+	
+	public List<Road도로명주소한글> findRoadNameBy도로명(String query) {
+		QRoad도로명주소한글 road = QRoad도로명주소한글.road도로명주소한글;
+		
+		return queryFactory
+				       .selectFrom(road)
+				       .where(
+						       road.도로명.containsIgnoreCase(query)   // ## 도로명 부분검색
+				       )
+				       .distinct()                                 // ## 중복 제거
+				       .orderBy(road.도로명.asc())                // ## 도로명 기준 정렬
+				       .fetch();
+	}
+	
 }
