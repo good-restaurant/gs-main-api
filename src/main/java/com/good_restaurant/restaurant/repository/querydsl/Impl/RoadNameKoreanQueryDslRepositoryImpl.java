@@ -4,6 +4,7 @@ import com.good_restaurant.restaurant.domain.QRoad도로명주소한글;
 import com.good_restaurant.restaurant.domain.Road도로명주소한글;
 import com.good_restaurant.restaurant.repository.querydsl.RoadNameKoreanQueryDslRepository;
 import com.querydsl.core.Tuple;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -14,6 +15,7 @@ import java.util.List;
 public class RoadNameKoreanQueryDslRepositoryImpl implements RoadNameKoreanQueryDslRepository {
 	
 	private final JPAQueryFactory queryFactory;
+	private static final String SEJONG = "세종특별자치시";
 	
 	@Override
 	public List<Road도로명주소한글> searchWide(String q, PageRequest of) {
@@ -73,12 +75,29 @@ public class RoadNameKoreanQueryDslRepositoryImpl implements RoadNameKoreanQuery
 		QRoad도로명주소한글 road = QRoad도로명주소한글.road도로명주소한글;
 		
 		return queryFactory
-				       .select(road.법정읍면동명, road.법정리명)
-				       .distinct()
-				       .from(road)
-				       .where(road.법정리명.isNotNull())
-				       .orderBy(road.법정리명.asc())
-				       .fetch();
+			       .select(road.법정읍면동명, road.법정리명)
+			       .distinct()
+			       .from(road)
+			       .where(road.법정리명.isNotNull())
+			       .orderBy(road.법정리명.asc())
+			       .fetch();
+	}
+
+	@Override
+	public List<Tuple> findDistinctTownByCity(String cityName) {
+		QRoad도로명주소한글 road = QRoad도로명주소한글.road도로명주소한글;
+		BooleanExpression predicate;
+		if (SEJONG.equals(cityName)) {
+			predicate = road.시도명.eq(SEJONG).and(road.시군구명.isNull());
+		} else {
+			predicate = road.시군구명.eq(cityName);
+		}
+		return queryFactory
+			       .select(road.법정읍면동명, road.법정리명)
+			       .distinct()
+			       .from(road)
+			       .where(predicate)
+			       .fetch();
 	}
 	
 	public List<Road도로명주소한글> findRoadNameBy도로명(String query) {

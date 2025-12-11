@@ -259,4 +259,28 @@ public class RoadNameKoreanServiceImpl implements RoadNameKoreanService, BaseCRU
 	}
 	
 	
+	public List<String> getTownListByCity(String cityQuery) {
+		if (cityQuery == null) return List.of();
+		String city = cityQuery.trim();
+		if (city.isEmpty()) return List.of();
+		
+		List<Tuple> rows = repository.findDistinctTownByCity(city);
+		
+		List<String> result = new ArrayList<>();
+		for (Tuple t : rows) {
+			String 읍면동 = t.get(0, String.class);
+			String 리 = t.get(1, String.class);
+			if (리 == null || 리.isBlank()) {
+				result.add(읍면동);
+			} else {
+				result.add(리);
+			}
+		}
+		return result.stream()
+			       .filter(Objects::nonNull)
+			       .distinct()
+			       .sorted(String::compareToIgnoreCase)
+			       .collect(Collectors.toList());
+	}
+	
 }
