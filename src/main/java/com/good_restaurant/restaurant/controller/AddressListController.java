@@ -107,5 +107,21 @@ public class AddressListController {
 	) {
 		return ResponseEntity.ok(service.searchTowns(q, limit));
 	}
+	
+	
+	/**
+	 * 도로명 검색 (LIKE 기반)
+	 *
+	 * @param q     검색어
+	 * @param limit 최대 반환 개수 (기본값 20)
+	 * @return 검색된 도로명 목록
+	 */
+	@GetMapping("/search/road")
+	public ResponseEntity<List<String>> searchRoad(
+			@RequestParam("q") String q,
+			@RequestParam(value = "limit", defaultValue = "20") int limit
+	) {
+		return ResponseEntity.ok(service.searchRoadAddresses(q, limit));
+	}
 }
 

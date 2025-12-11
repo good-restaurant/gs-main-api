@@ -1,9 +1,12 @@
 package com.good_restaurant.restaurant.service.impl;
 
+import com.good_restaurant.restaurant.domain.Restaurant;
 import com.good_restaurant.restaurant.domain.RestaurantComment;
 import com.good_restaurant.restaurant.domain.RestaurantCommentFullDto;
 import com.good_restaurant.restaurant.domain.RestaurantMenu;
 import com.good_restaurant.restaurant.repository.RestaurantCommentRepository;
+import com.good_restaurant.restaurant.repository.RestaurantRepository;
+import com.good_restaurant.restaurant.service.A_Exception.EntityNotFoundException;
 import com.good_restaurant.restaurant.service.A_Exception.MergePropertyException;
 import com.good_restaurant.restaurant.service.A_base.BaseCRUD;
 import com.good_restaurant.restaurant.service.A_base.ServiceHelper;
@@ -32,6 +35,7 @@ public class RestaurantCommentServiceImpl implements RestaurantCommentService, B
 	private final RestaurantCommentRepository repository;
 	private final ServiceHelper<RestaurantComment, Long> serviceHelper;
 	private final SignedUrlUploadService uploadService;
+	private final RestaurantRepository restaurantRepository;
 	
 	@Override
 	public RestaurantComment updateRule(RestaurantComment source, RestaurantComment target) throws MergePropertyException {
@@ -88,7 +92,25 @@ public class RestaurantCommentServiceImpl implements RestaurantCommentService, B
 	
 	@Override
 	public RestaurantComment createComment(RestaurantComment entity) {
-		return save(entity);
+		// 1) 유효성: restaurant와 id가 반드시 있어야 함
+		if (entity.getRestaurant() == null || entity.getRestaurant().getId() == null) {
+			throw new IllegalArgumentException("restaurantId is required");
+		}
+		
+		Long restaurantId = entity.getRestaurant().getId();
+		
+		// 2) 존재여부 체크(404 대응)
+		if (!restaurantRepository.existsById(restaurantId)) {
+			throw new EntityNotFoundException("Restaurant not found: " + restaurantId);
+		}
+		
+		// 3) Transient Restaurant → Managed reference 로 교체
+		var managedRef = restaurantRepository.getReferenceById(restaurantId);
+		
+		// Lombok @Builder(toBuilder = true)를 활용해 필드 교체
+		var toSave = entity.toBuilder().restaurant(managedRef).build();
+		
+		return repository.save(toSave);
 	}
 	
 	@SneakyThrows

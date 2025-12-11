@@ -23,5 +23,6 @@ public interface RoadNameKoreanService extends BaseCRUD<Road도로명주소한�
 	
 	List<String> searchTowns(String query, int limit);
 	
+	List<String> searchRoadAddresses(String q, int limit);
 	List<String> getTownListByCity(String cityQuery);
 }

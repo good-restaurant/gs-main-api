@@ -235,6 +235,30 @@ public class RoadNameKoreanServiceImpl implements RoadNameKoreanService, BaseCRU
 	}
 	
 	@Override
+	public List<String> searchRoadAddresses(String query, int limit) {
+		String q = query == null ? "" : query.trim();
+		if (q.isEmpty()) return List.of();
+		
+		// ## QueryDSL에서 엔티티 반환
+		List<Road도로명주소한글> roads =
+				repository.findRoadNameBy도로명(q);
+		
+		// ## 서비스는 도로명 추출 + 랭킹 + limit만 담당
+		return roads.stream()
+				       .map(Road도로명주소한글::get도로명)  // ## 엔티티 → 도로명 문자열
+				       .filter(Objects::nonNull)            // ## null 방지
+				       .distinct()                          // ## 중복 제거
+				       .sorted(
+						       Comparator
+								       .comparing((String s) -> !s.startsWith(q))   // ## startsWith 우선
+								       .thenComparing(s -> !s.contains(q))         // ## contains 다음
+								       .thenComparing(String::compareToIgnoreCase) // ## 정렬
+				       )
+				       .limit(limit)
+				       .toList();
+	}
+	
+	
 	public List<String> getTownListByCity(String cityQuery) {
 		if (cityQuery == null) return List.of();
 		String city = cityQuery.trim();
